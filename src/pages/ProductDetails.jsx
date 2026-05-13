@@ -729,21 +729,30 @@ className={`w-full h-16 border-2 rounded-2xl px-5 text-xl outline-none ${
         اختر المدينة
       </option>
 
-      <option>
-        Tunis
-      </option>
-
-      <option>
-        Sfax
-      </option>
-
-      <option>
-        Sousse
-      </option>
-
-      <option>
-        Nabeul
-      </option>
+    <option>Tunis</option>
+<option>Ariana</option>
+<option>Ben Arous</option>
+<option>Manouba</option>
+<option>Nabeul</option>
+<option>Zaghouan</option>
+<option>Sousse</option>
+<option>Monastir</option>
+<option>Mahdia</option>
+<option>Sfax</option>
+<option>Skhira</option>
+<option>Gabès</option>
+<option>Medenine</option>
+<option>Tataouine</option>
+<option>Gafsa</option>
+<option>Tozeur</option>
+<option>Kebili</option>
+<option>Kairouan</option>
+<option>Kasserine</option>
+<option>Sidi Bouzid</option>
+<option>Jendouba</option>
+<option>Kef</option>
+<option>Siliana</option>
+<option>Bizerte</option>
 
     </select>
 

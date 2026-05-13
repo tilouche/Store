@@ -1,10 +1,36 @@
+import { useState } from "react";
+
+import toast from "react-hot-toast";
+
+import {
+  createOrder,
+} from "../services/supabase";
+
 export default function CartDrawer({
   open,
   setOpen,
   cart,
   setCart,
-  setCheckoutOpen,
 }) {
+
+  // ============================
+  // STATES
+  // ============================
+
+  const [clientName, setClientName] =
+    useState("");
+
+  const [phone, setPhone] =
+    useState("");
+
+  const [address, setAddress] =
+    useState("");
+
+  const [city, setCity] =
+    useState("");
+
+  const [errors, setErrors] =
+    useState({});
 
   // ============================
   // TOTAL
@@ -17,12 +43,116 @@ export default function CartDrawer({
     0
   );
 
-  const delivery = subtotal > 0
-    ? 8
-    : 0;
+  const delivery =
+    subtotal > 0
+      ? 8
+      : 0;
 
   const total =
     subtotal + delivery;
+
+  // ============================
+  // VALIDATION
+  // ============================
+
+  const validateForm =
+    () => {
+
+      const newErrors = {};
+
+      if (!clientName)
+        newErrors.clientName = true;
+
+      if (!phone)
+        newErrors.phone = true;
+
+      if (!address)
+        newErrors.address = true;
+
+      if (!city)
+        newErrors.city = true;
+
+      setErrors(
+        newErrors
+      );
+
+      if (
+        Object.keys(
+          newErrors
+        ).length > 0
+      ) {
+
+        toast.error(
+          "أكمل المعلومات"
+        );
+
+        return false;
+      }
+
+      return true;
+    };
+
+  // ============================
+  // SUBMIT ORDER
+  // ============================
+
+  const handleOrder =
+    async () => {
+
+      if (!validateForm())
+        return;
+
+      try {
+
+        const order = {
+
+          client_name:
+            clientName,
+
+          phone,
+
+          address:
+            `${address} - ${city}`,
+
+          total,
+
+          status:
+            "nouveau",
+
+          items: cart,
+        };
+
+        await createOrder(
+          order
+        );
+
+        toast.success(
+          "✅ تم إرسال الطلب"
+        );
+
+        setCart([]);
+
+        localStorage.removeItem(
+          "cart"
+        );
+
+        setClientName("");
+
+        setPhone("");
+
+        setAddress("");
+
+        setCity("");
+
+      } catch (err) {
+
+        console.log(err);
+
+        toast.error(
+          "حدث خطأ"
+        );
+      }
+    };
 
   // ============================
   // QUANTITY +
@@ -43,6 +173,11 @@ export default function CartDrawer({
     );
 
     setCart(updated);
+
+    localStorage.setItem(
+      "cart",
+      JSON.stringify(updated)
+    );
   };
 
   // ============================
@@ -52,6 +187,7 @@ export default function CartDrawer({
   const decreaseQty = (id) => {
 
     const updated = cart
+
       .map((item) =>
 
         item.id === id
@@ -62,16 +198,22 @@ export default function CartDrawer({
             }
           : item
       )
+
       .filter(
         (item) =>
           item.quantity > 0
       );
 
     setCart(updated);
+
+    localStorage.setItem(
+      "cart",
+      JSON.stringify(updated)
+    );
   };
 
   // ============================
-  // REMOVE ITEM
+  // REMOVE
   // ============================
 
   const removeItem = (id) => {
@@ -83,10 +225,13 @@ export default function CartDrawer({
       );
 
     setCart(updated);
+
+    localStorage.setItem(
+      "cart",
+      JSON.stringify(updated)
+    );
   };
 
-  // ============================
-  // CLOSE
   // ============================
 
   if (!open) return null;
@@ -99,197 +244,401 @@ export default function CartDrawer({
 
     <div className="fixed inset-0 z-50 flex justify-end bg-black/40">
 
-      <div className="bg-white w-full sm:max-w-lg h-screen p-6 overflow-y-auto animate-slide-left">
+      <div
+        dir="rtl"
+        className="bg-white w-full sm:max-w-lg h-screen overflow-y-auto animate-slide-left"
+      >
 
         {/* HEADER */}
-        <div className="flex justify-between items-center mb-8">
+        <div className="sticky top-0 bg-white z-10 border-b p-5 flex justify-between items-center">
 
           <h2 className="text-3xl font-black">
-            🛒 Your Cart
+
+            🛒 السلة
+
           </h2>
 
           <button
             onClick={() =>
               setOpen(false)
             }
-            className="text-2xl"
+            className="text-3xl"
           >
             ✖
           </button>
 
         </div>
 
-        {/* EMPTY */}
-        {cart.length === 0 && (
+        <div className="p-5">
 
-          <div className="text-center mt-20">
+          {/* EMPTY */}
+          {cart.length === 0 && (
 
-            <h3 className="text-2xl font-bold">
-              Cart is empty
-            </h3>
+            <div className="text-center mt-20">
 
-            <p className="text-gray-400 mt-3">
-              Add some products 🛍
-            </p>
+              <h3 className="text-3xl font-black">
+
+                السلة فارغة
+
+              </h3>
+
+              <p className="text-gray-400 mt-4">
+
+                أضف بعض المنتجات 🛍
+
+              </p>
+
+            </div>
+          )}
+
+          {/* ITEMS */}
+          <div className="space-y-5">
+
+            {cart.map(
+              (
+                item,
+                index
+              ) => (
+
+                <div
+                  key={`${item.id}-${item.selectedSize}-${item.selectedColor}-${index}`}
+                  className="border rounded-[30px] p-4"
+                >
+
+                  {/* IMAGE */}
+                  <img
+                    src={item.image}
+                    alt=""
+                    className="w-full h-72 object-cover rounded-[25px]"
+                  />
+
+                  {/* INFO */}
+                  <div className="mt-4">
+
+                    <h3 className="text-2xl font-black">
+
+                      {item.name}
+
+                    </h3>
+
+                    {/* SIZE */}
+                    {item.selectedSize && (
+
+                      <p className="text-gray-500 mt-2">
+
+                        المقاس:
+                        {" "}
+                        {
+                          item.selectedSize
+                        }
+
+                      </p>
+                    )}
+
+                    {/* COLOR */}
+                    {item.selectedColor && (
+
+                      <p className="text-gray-500">
+
+                        اللون:
+                        {" "}
+                        {
+                          item.selectedColor
+                        }
+
+                      </p>
+                    )}
+
+                    {/* PRICE */}
+                    <p className="text-3xl font-black text-green-600 mt-4">
+
+                      {item.price}
+                      {" "}
+                      د.ت
+
+                    </p>
+
+                    {/* QUANTITY */}
+                    <div className="flex items-center justify-between mt-5">
+
+                      <div className="flex items-center border rounded-2xl overflow-hidden">
+
+                        <button
+                          onClick={() =>
+                            decreaseQty(
+                              item.id
+                            )
+                          }
+                          className="w-14 h-14 text-2xl"
+                        >
+
+                          -
+
+                        </button>
+
+                        <div className="w-14 text-center text-xl font-black">
+
+                          {
+                            item.quantity
+                          }
+
+                        </div>
+
+                        <button
+                          onClick={() =>
+                            increaseQty(
+                              item.id
+                            )
+                          }
+                          className="w-14 h-14 text-2xl"
+                        >
+
+                          +
+
+                        </button>
+
+                      </div>
+
+                      {/* REMOVE */}
+                      <button
+                        onClick={() =>
+                          removeItem(
+                            item.id
+                          )
+                        }
+                        className="text-red-500 font-bold"
+                      >
+
+                        حذف
+
+                      </button>
+
+                    </div>
+
+                  </div>
+
+                </div>
+              )
+            )}
 
           </div>
-        )}
 
-        {/* ITEMS */}
-        <div className="space-y-5">
+          {/* TOTAL */}
+          {cart.length > 0 && (
 
-          {cart.map((item,index) => (
+            <>
 
-            <div
-             key={`${item.id}-${item.selectedSize}-${item.selectedColor}-${index}`}
-                className="flex flex-col sm:flex-row gap-4 border rounded-3xl p-4"
-              >
+              <div className="mt-10 border rounded-[30px] p-6">
 
-              {/* IMAGE */}
-              <img
-                src={item.image}
-                alt=""
-                className="w-full sm:w-28 h-56 sm:h-28 object-cover rounded-2xl"
-                />
+                <h3 className="text-3xl font-black mb-6">
 
-              {/* INFO */}
-              <div className="flex-1">
+                  ملخص الطلب
 
-                <h3 className="font-black text-lg">
-                  {item.name}
                 </h3>
 
-                {/* SIZE */}
-                {item.selectedSize && (
-                  <p className="text-sm text-gray-500 mt-1">
-                    Size:
-                    {" "}
-                    {item.selectedSize}
-                  </p>
-                )}
+                {/* SUBTOTAL */}
+                <div className="flex justify-between mb-4 text-lg">
 
-                {/* COLOR */}
-                {item.selectedColor && (
-                  <p className="text-sm text-gray-500">
-                    Color:
-                    {" "}
-                    {item.selectedColor}
-                  </p>
-                )}
+                  <span>
 
-                <p className="text-green-600 font-black mt-2">
-                  {item.price} DT
-                </p>
+                    المجموع الفرعي
 
-                {/* QUANTITY */}
-                <div className="flex items-center gap-3 mt-4">
-
-                  <button
-                    onClick={() =>
-                      decreaseQty(
-                        item.id
-                      )
-                    }
-                    className="w-9 h-9 rounded-full bg-gray-100"
-                  >
-                    -
-                  </button>
-
-                  <span className="font-bold">
-                    {item.quantity}
                   </span>
 
-                  <button
-                    onClick={() =>
-                      increaseQty(
-                        item.id
-                      )
-                    }
-                    className="w-9 h-9 rounded-full bg-black text-white"
-                  >
-                    +
-                  </button>
+                  <span>
+
+                    {subtotal}
+                    {" "}
+                    د.ت
+
+                  </span>
 
                 </div>
 
-                {/* REMOVE */}
+                {/* DELIVERY */}
+                <div className="flex justify-between mb-4 text-lg text-gray-500">
+
+                  <span>
+                    التوصيل
+                  </span>
+
+                  <span>
+
+                    {delivery}
+                    {" "}
+                    د.ت
+
+                  </span>
+
+                </div>
+
+                {/* TOTAL */}
+                <div className="border-t pt-5 flex justify-between text-3xl font-black">
+
+                  <span>
+                    المجموع
+                  </span>
+
+                  <span>
+
+                    {total}
+                    {" "}
+                    د.ت
+
+                  </span>
+
+                </div>
+
+              </div>
+
+              {/* CHECKOUT FORM */}
+              <div className="mt-10 border-2 border-dashed border-indigo-500 rounded-[30px] p-5">
+
+                <h2 className="text-3xl font-black mb-8">
+
+                  معلومات الطلب
+
+                </h2>
+
+                {/* NAME */}
+                <div className="mb-5">
+
+                  <input
+                    type="text"
+                    placeholder="الاسم واللقب"
+                    value={
+                      clientName
+                    }
+                    onChange={(e) =>
+                      setClientName(
+                        e.target
+                          .value
+                      )
+                    }
+                    className={`w-full h-14 border-2 rounded-2xl px-5 text-right ${
+                      errors.clientName
+                        ? "border-red-500"
+                        : "border-gray-200"
+                    }`}
+                  />
+
+                </div>
+
+                {/* PHONE */}
+                <div className="mb-5">
+
+                  <input
+                    type="text"
+                    placeholder="الهاتف"
+                    value={phone}
+                    onChange={(e) =>
+                      setPhone(
+                        e.target
+                          .value
+                      )
+                    }
+                    className={`w-full h-14 border-2 rounded-2xl px-5 text-right ${
+                      errors.phone
+                        ? "border-red-500"
+                        : "border-gray-200"
+                    }`}
+                  />
+
+                </div>
+
+                {/* ADDRESS */}
+                <div className="mb-5">
+
+                  <input
+                    type="text"
+                    placeholder="العنوان"
+                    value={address}
+                    onChange={(e) =>
+                      setAddress(
+                        e.target
+                          .value
+                      )
+                    }
+                    className={`w-full h-14 border-2 rounded-2xl px-5 text-right ${
+                      errors.address
+                        ? "border-red-500"
+                        : "border-gray-200"
+                    }`}
+                  />
+
+                </div>
+
+                {/* CITY */}
+                <div className="mb-6">
+
+                  <select
+                    value={city}
+                    onChange={(e) =>
+                      setCity(
+                        e.target
+                          .value
+                      )
+                    }
+                    className={`w-full h-14 border-2 rounded-2xl px-5 text-right bg-white ${
+                      errors.city
+                        ? "border-red-500"
+                        : "border-gray-200"
+                    }`}
+                  >
+
+                    <option value="">
+                      اختر المدينة
+                    </option>
+  <option>Tunis</option>
+<option>Ariana</option>
+<option>Ben Arous</option>
+<option>Manouba</option>
+<option>Nabeul</option>
+<option>Zaghouan</option>
+<option>Sousse</option>
+<option>Monastir</option>
+<option>Mahdia</option>
+<option>Sfax</option>
+<option>Skhira</option>
+<option>Gabès</option>
+<option>Medenine</option>
+<option>Tataouine</option>
+<option>Gafsa</option>
+<option>Tozeur</option>
+<option>Kebili</option>
+<option>Kairouan</option>
+<option>Kasserine</option>
+<option>Sidi Bouzid</option>
+<option>Jendouba</option>
+<option>Kef</option>
+<option>Siliana</option>
+<option>Bizerte</option>
+
+                  </select>
+
+                </div>
+
+                {/* BUTTON */}
                 <button
-                  onClick={() =>
-                    removeItem(
-                      item.id
-                    )
+                  onClick={
+                    handleOrder
                   }
-                  className="mt-4 text-red-500 text-sm"
+                  className="w-full bg-indigo-900 text-white h-16 rounded-2xl text-2xl font-black"
                 >
-                  Remove
+
+                  اشترِ الآن 🛒
+
                 </button>
 
               </div>
-            </div>
-          ))}
+
+            </>
+          )}
 
         </div>
 
-        {/* TOTALS */}
-        {cart.length > 0 && (
-
-          <div className="mt-10 border-t pt-6">
-
-            <div className="flex justify-between mb-3">
-
-              <span className="text-gray-500">
-                Subtotal
-              </span>
-
-              <span className="font-bold">
-                {subtotal} DT
-              </span>
-
-            </div>
-
-            <div className="flex justify-between mb-3">
-
-              <span className="text-gray-500">
-                Delivery
-              </span>
-
-              <span className="font-bold">
-                {delivery} DT
-              </span>
-
-            </div>
-
-            <div className="flex justify-between text-2xl font-black">
-
-              <span>Total</span>
-
-              <span>
-                {total} DT
-              </span>
-
-            </div>
-
-            {/* CHECKOUT */}
-            <button
-              onClick={() => {
-
-                setCheckoutOpen(
-                  true
-                );
-
-                setOpen(false);
-              }}
-              className="w-full mt-6 bg-black hover:bg-gray-800 text-white py-5 rounded-3xl text-lg font-black transition"
-            >
-
-              Checkout
-
-            </button>
-
-          </div>
-        )}
-
       </div>
+
     </div>
   );
 }
