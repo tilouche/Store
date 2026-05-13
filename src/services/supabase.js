@@ -47,33 +47,31 @@ export const adminLogout = async () => {
   await supabase.auth.signOut();
 };
 // 📦 GET ORDERS
+export const getOrders =
+  async () => {
 
-export const getOrders = async () => {
+    const {
+      data,
+      error,
+    } = await supabase
 
-  const { data, error } =
-    await supabase
       .from("orders")
+
       .select("*")
-      .order("created_at", {
-        ascending: false,
-      });
 
-  console.log(
-    "ORDERS 👉",
-    data
-  );
+      .order(
+        "created_at",
+        {
+          ascending: false,
+        }
+      );
 
-  console.log(
-    "ERROR 👉",
-    error
-  );
+    if (error)
+      throw error;
 
-  if (error) {
-    throw error;
-  }
+    return data;
+  };
 
-  return data;
-};
 
 export const createOrder =
   async (orderData) => {

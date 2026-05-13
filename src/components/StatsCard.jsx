@@ -40,12 +40,7 @@ export default function StatsCard({
 
   const stats = [
 
-    {
-      title: "Revenue",
-      value: `${revenue} DT`,
-      icon: DollarSign,
-    },
-
+ 
     {
       title: "Orders",
       value: totalOrders,

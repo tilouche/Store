@@ -11,6 +11,7 @@ export default function Navbar({
   notifications,
   showNotifications,
   setShowNotifications,
+  setNotifications
 }) {
 
   return (
@@ -56,11 +57,29 @@ export default function Navbar({
         <div className="relative">
 
           <button
-            onClick={() =>
-              setShowNotifications(
-                !showNotifications
-              )
-            }
+           onClick={() => {
+
+                setShowNotifications(
+                    !showNotifications
+                );
+
+                // MARK READ
+                if (!showNotifications) {
+
+                    const updated =
+                    notifications.map(
+                        (n) => ({
+
+                        ...n,
+                        read: true,
+                        })
+                    );
+
+                    setNotifications(
+                    updated
+                    );
+                }
+                }}
             className="relative bg-white p-4 rounded-2xl shadow-sm border"
           >
 
@@ -70,7 +89,11 @@ export default function Navbar({
 
               <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs w-6 h-6 rounded-full flex items-center justify-center font-bold">
 
-                {notifications.length}
+                {
+                notifications.filter(
+                    (n) => !n.read
+                ).length
+                }
 
               </span>
             )}

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-
+import { useRef } from "react";
 import toast from "react-hot-toast";
 
 import Sidebar from "../components/Sidebar";
@@ -7,6 +7,7 @@ import Navbar from "../components/Navbar";
 import StatsCard from "../components/StatsCard";
 import ProductModal from "../components/ProductModal";
 import OrderDetailsModal from "../components/OrderDetailsModal";
+import notificationMp3 from "../assets/notification.wav";
 
 import {
   adminLogin,
@@ -40,6 +41,8 @@ export default function Admin() {
 
   const [search, setSearch] =
     useState("");
+    const [orderTab, setOrderTab] =
+  useState("nouveau");
 
   const [orders, setOrders] =
     useState([]);
@@ -69,6 +72,13 @@ const [openOrderModal, setOpenOrderModal] =
 
 const [showNotifications, setShowNotifications] =
   useState(false);
+
+  const notificationAudio =
+  useRef(null);
+  const audio =
+  new Audio(
+    notificationMp3
+  );
   // ============================
   // LOGIN
   // ============================
@@ -114,15 +124,31 @@ const [showNotifications, setShowNotifications] =
   // ORDERS
   // ============================
 
-  const fetchOrders =
-    async () => {
+const fetchOrders =
+  async () => {
 
-      const data =
-        await getOrders();
+    const data =
+      await getOrders();
 
-      setOrders(data || []);
-    };
+    const sorted =
+      data.sort(
+        (a, b) =>
 
+          new Date(
+            b.created_at ||
+            0
+          ) -
+
+          new Date(
+            a.created_at ||
+            0
+          )
+      );
+
+    setOrders(
+      [...sorted]
+    );
+  };
   const handleStatus =
     async (id, status) => {
 
@@ -201,48 +227,56 @@ const [showNotifications, setShowNotifications] =
     fetchProducts();
 
     const channel =
-      subscribeToOrders(
-        async (payload) => {
+  subscribeToOrders(
+    async (payload) => {
 
-          console.log(
-            "REALTIME 👉",
-            payload
-          );
-
-          if (
-            payload.eventType ===
-            "INSERT"
-            
-          ) setNotifications((prev) => [
-
-  {
-    id: Date.now(),
-    text: `🆕 New order from ${payload.new.client_name}`,
-    time: new Date().toLocaleTimeString(),
-  },
-
-  ...prev,
-]);{
-
-            toast.success(
-              "🆕 New order received"
-            );
-
-            try {
-
-              new Audio(
-                "/notif.mp3"
-              ).play();
-
-            } catch (err) {
-
-              console.log(err);
-            }
-          }
-
-          await fetchOrders();
-        }
+      console.log(
+        "REALTIME 👉",
+        payload
       );
+
+      // ONLY INSERT
+    if (
+  payload.eventType ===
+  "INSERT"
+) {
+
+  audio.currentTime = 0;
+
+  audio.play().catch(
+    (err) => {
+      console.log(err);
+    }
+  );
+
+  toast.success(
+    "🆕 New Order"
+  );
+
+  setNotifications(
+    (prev) => [
+
+      {
+        id: Date.now(),
+
+        text:
+          `🛒 New order from ${payload.new.client_name}`,
+
+        time:
+          new Date().toLocaleTimeString(),
+
+        read: false,
+      },
+
+      ...prev,
+    ]
+  );
+}
+
+      // REFRESH
+      await fetchOrders();
+    }
+  );
 
     return () => {
       channel.unsubscribe();
@@ -356,9 +390,10 @@ const [showNotifications, setShowNotifications] =
               📦 Orders
             </h2>
 
-            <div className="flex gap-3 overflow-x-auto mb-6">
+           <div className="flex gap-3 overflow-x-auto mb-6">
 
   {[
+    "tous",
     "nouveau",
     "confirmé",
     "expédié",
@@ -369,10 +404,13 @@ const [showNotifications, setShowNotifications] =
     <button
       key={status}
       onClick={() =>
-        setOrderFilter(status)
+        setOrderFilter(
+          status
+        )
       }
       className={`px-5 py-3 rounded-2xl whitespace-nowrap transition font-bold ${
-        orderFilter === status
+        orderFilter ===
+        status
           ? "bg-black text-white"
           : "bg-gray-100"
       }`}
@@ -383,13 +421,18 @@ const [showNotifications, setShowNotifications] =
       {" "}
 
       (
-      {
-        orders.filter(
-          (o) =>
-            o.status ===
-            status
-        ).length
-      }
+
+      {status ===
+      "tous"
+
+        ? orders.length
+
+        : orders.filter(
+            (o) =>
+              o.status ===
+              status
+          ).length}
+
       )
 
     </button>
@@ -397,15 +440,26 @@ const [showNotifications, setShowNotifications] =
 
 </div>
 
+
+
             <div className="space-y-4">
 
               {orders
 
-  .filter(
-    (o) =>
-      o.status ===
+ .filter((o) =>
+
+  orderFilter ===
+  "tous"
+
+    ? true
+
+    : o.status ===
       orderFilter
-  )
+)
+.sort(
+  (a, b) =>
+    b.id.localeCompare(a.id)
+)
 
   .filter((o) =>
     o.client_name
@@ -703,6 +757,8 @@ const [showNotifications, setShowNotifications] =
             setOpen={setOpenOrderModal}
             order={selectedOrder}
             />
+
+        
 
       </div>
     </div>

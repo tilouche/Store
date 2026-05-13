@@ -5,7 +5,7 @@ import CartDrawer from "../components/CartDrawer";
 import CheckoutModal from "../components/CheckoutModal";
 import useCart from "../hooks/useCart";
 import { getProducts } from "../services/supabase";
-
+import heroImage from "../assets/heroo.png";
 import { ShoppingCart } from "lucide-react";
 
 import toast from "react-hot-toast";
@@ -141,29 +141,15 @@ className="relative bg-black text-white p-3 md:p-4 rounded-2xl"          >
       </div>
 
       {/* HERO */}
-      <div className="max-w-7xl mx-auto px-6 py-14">
+      <div className="max-w-7xl mx-auto px-2 py-6">
 
-<div className="bg-black text-white rounded-[30px] md:rounded-[40px] p-6 md:p-12 mb-10">
-          <p className="uppercase text-sm tracking-[5px] text-gray-400">
+  <img
+  src={heroImage}
+  alt="hero"
+  className="w-full h-[180
+  px] object-cover rounded-[10px]"
+/>
 
-            New Collection
-
-          </p>
-
-<h2 className="text-4xl md:text-6xl font-black mt-4 leading-tight">
-            Ahmed <br />
-
-            Tilouche
-
-          </h2>
-
-          <p className="text-gray-400 mt-5 max-w-xl">
-
-          
-
-          </p>
-
-        </div>
 
         {/* PRODUCTS HEADER */}
         <div className="flex justify-between items-center mb-8">
@@ -182,15 +168,224 @@ className="relative bg-black text-white p-3 md:p-4 rounded-2xl"          >
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
           {products.map((product) => (
 
-            <ProductCard
-              key={product.id}
-              product={product}
-              addToCart={addToCart}
+           <ProductCard
+            key={product.id}
+            product={product}
             />
 
           ))}
 
         </div>
+{/* SERVICES */}
+<div className="bg-[#2F2F2F] text-white py-12 mt-24">
+
+  <div className="grid grid-cols-2 md:grid-cols-4 gap-10 max-w-6xl mx-auto px-6 text-center">
+
+    {/* ITEM */}
+    <div>
+
+      <div className="text-5xl mb-4">
+        🏠
+      </div>
+
+      <h3 className="font-black text-xl uppercase">
+
+        Livraison à domicile
+
+      </h3>
+
+      <p className="mt-3 text-white/90">
+
+        Toute la Tunisie
+
+      </p>
+
+    </div>
+
+    {/* ITEM */}
+    <div>
+
+      <div className="text-5xl mb-4">
+        🔄
+      </div>
+
+      <h3 className="font-black text-xl">
+
+        Echange
+
+      </h3>
+
+      <p className="mt-3 text-white/90">
+
+        Echange dans 72H
+
+      </p>
+
+    </div>
+
+    {/* ITEM */}
+    <div>
+
+      <div className="text-5xl mb-4">
+        🚚
+      </div>
+
+      <h3 className="font-black text-xl uppercase">
+
+        Livraison Rapide
+
+      </h3>
+
+      <p className="mt-3 text-white/90">
+
+        Livraison en 1 à 3 jours
+
+      </p>
+
+    </div>
+
+    {/* ITEM */}
+    <div>
+
+      <div className="text-5xl mb-4">
+        💵
+      </div>
+
+      <h3 className="font-black text-xl uppercase">
+
+        Paiement Cash
+
+      </h3>
+
+      <p className="mt-3 text-white/90">
+
+        Main à main
+
+      </p>
+
+    </div>
+
+  </div>
+
+</div>
+
+{/* FOOTER */}
+<footer className="bg-[#f5f5f5] py-20 relative">
+
+  <div className="max-w-6xl mx-auto px-6">
+
+    {/* CONTACT */}
+    <div className="text-center">
+
+      <h2 className="text-4xl font-black">
+
+        Lundi au Dimanche de 9h à 18h
+
+      </h2>
+
+      <p className="text-2xl font-bold mt-4">
+
+        +216 *****
+
+      </p>
+
+    
+
+    </div>
+
+    {/* GRID */}
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mt-20 text-center">
+
+      {/* CATEGORIES */}
+      <div>
+
+        <h3 className="text-4xl font-black mb-8">
+
+          Catégories
+
+        </h3>
+
+        <div className="space-y-4 text-gray-400 text-2xl">
+
+          <p>Ensemble </p>
+
+          <p>T-shirt</p>
+
+        </div>
+
+      </div>
+
+      {/* RESOURCES */}
+      <div>
+
+        <h3 className="text-4xl font-black mb-8">
+
+          Resources
+
+        </h3>
+
+        <div className="space-y-4 text-gray-400 text-2xl">
+
+          <p>Notre histoire</p>
+
+          <p>Contactez-nous</p>
+
+          <p>Livraison et échange</p>
+
+        </div>
+
+      </div>
+
+      {/* SOCIAL */}
+      <div>
+
+        <h3 className="text-4xl font-black mb-8">
+
+          Social Media
+
+        </h3>
+
+        <div className="space-y-4 text-gray-400 text-2xl">
+
+          <p>Facebook</p>
+
+          <p>Instagram</p>
+
+          <p>Tiktok</p>
+
+          <p>WhatsApp</p>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    {/* COPYRIGHT */}
+    <div className="border-t mt-20 pt-8 text-center text-gray-400 text-lg">
+
+     ........
+
+    </div>
+
+  </div>
+
+  {/* SCROLL TOP */}
+  <button
+    onClick={() =>
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      })
+    }
+    className="fixed bottom-6 right-6 bg-black text-white w-16 h-16 text-3xl rounded-sm shadow-xl"
+  >
+
+    ↑
+
+  </button>
+
+</footer>
 
       </div>
 

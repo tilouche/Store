@@ -1,4 +1,7 @@
 import { useState } from "react";
+
+import toast from "react-hot-toast";
+
 import {
   uploadImage,
 } from "../services/supabase";
@@ -12,275 +15,446 @@ export default function ProductModal({
   const [uploading, setUploading] =
     useState(false);
 
- const [form, setForm] = useState({
-  name: "",
-  price: "",
-  stock: "",
-  category: "",
-  image: "",
-  images: [],
-  sizes: "",
-  colors: "",
-});
+  const [form, setForm] =
+    useState({
+
+      name: "",
+
+      price: "",
+
+      stock: "",
+
+      category: "",
+
+      image: "",
+
+      images: [],
+
+      sizes: "",
+
+      colors: "",
+    });
 
   // ============================
-  // HANDLE CHANGE
+  // CHANGE
   // ============================
 
   const handleChange = (e) => {
 
     setForm({
+
       ...form,
+
       [e.target.name]:
         e.target.value,
     });
   };
 
   // ============================
+  // UPLOAD
+  // ============================
+
+  const handleUpload =
+    async (e) => {
+
+      const files =
+        Array.from(
+          e.target.files
+        );
+
+      if (!files.length)
+        return;
+
+      try {
+
+        setUploading(true);
+
+        const uploadedImages =
+          [];
+
+        for (const file of files) {
+
+          const imageUrl =
+            await uploadImage(
+              file
+            );
+
+          uploadedImages.push(
+            imageUrl
+          );
+        }
+
+        setForm((prev) => ({
+
+          ...prev,
+
+          image:
+            uploadedImages[0],
+
+          images: [
+            ...(prev.images ||
+              []),
+
+            ...uploadedImages,
+          ],
+        }));
+
+        toast.success(
+          "✅ Images uploaded"
+        );
+
+      } catch (err) {
+
+        console.log(err);
+
+        toast.error(
+          "Upload failed"
+        );
+
+      } finally {
+
+        setUploading(false);
+      }
+    };
+
+  // ============================
   // SUBMIT
   // ============================
 
-  const handleSubmit = async (
-    e
-  ) => {
+  const handleSubmit =
+    async (e) => {
 
-    e.preventDefault();
+      e.preventDefault();
 
-    console.log(
-      "SUBMIT WORKING"
-    );
+      try {
 
-    try {
+        await onAdd({
 
-            await onAdd({
-        ...form,
+          ...form,
 
-        price: Number(form.price),
+          price:
+            Number(
+              form.price
+            ),
 
-        stock: Number(form.stock),
+          stock:
+            Number(
+              form.stock
+            ),
 
-        sizes:
-  typeof form.sizes === "string"
-    ? form.sizes
-        .split(",")
-        .map((s) => s.trim())
-    : form.sizes,
+          sizes:
+            typeof form.sizes ===
+            "string"
+              ? form.sizes
+                  .split(",")
+                  .map((s) =>
+                    s.trim()
+                  )
+              : form.sizes,
 
-        colors:
-  typeof form.colors === "string"
-    ? form.colors
-        .split(",")
-        .map((c) => c.trim())
-    : form.colors,
+          colors:
+            typeof form.colors ===
+            "string"
+              ? form.colors
+                  .split(",")
+                  .map((c) =>
+                    c.trim()
+                  )
+              : form.colors,
         });
 
-      setForm({
-        name: "",
-        price: "",
-        stock: "",
-        category: "",
-        image: "",
-        images: [],
-     
-      });
+        toast.success(
+          "🛍 Product added"
+        );
 
-      setOpen(false);
+        setForm({
 
-    } catch (err) {
+          name: "",
 
-      console.error(err);
-    }
-  };
+          price: "",
+
+          stock: "",
+
+          category: "",
+
+          image: "",
+
+          images: [],
+
+          sizes: "",
+
+          colors: "",
+        });
+
+        setOpen(false);
+
+      } catch (err) {
+
+        console.log(err);
+
+        toast.error(
+          "Failed"
+        );
+      }
+    };
 
   // ============================
 
   if (!open) return null;
 
+  // ============================
+  // UI
+  // ============================
+
   return (
 
-    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-3">
 
-      <div className="bg-white w-full max-w-lg rounded-3xl p-6 shadow-2xl">
+      <div className="bg-white w-full max-w-2xl rounded-[40px] shadow-2xl overflow-hidden max-h-[95vh] overflow-y-auto">
 
         {/* HEADER */}
-        <div className="flex justify-between items-center mb-6">
+        <div className="flex justify-between items-center p-6 border-b">
 
-          <h2 className="text-2xl font-black">
-            ➕ Add Product
-          </h2>
+          <div>
+
+            <h2 className="text-3xl font-black">
+              ➕ Add Product
+            </h2>
+
+            <p className="text-gray-400 mt-1">
+
+              Create new product
+
+            </p>
+
+          </div>
 
           <button
             onClick={() =>
               setOpen(false)
             }
-            className="text-xl"
+            className="text-2xl"
           >
-            ✕
+            ✖
           </button>
 
         </div>
 
         {/* FORM */}
         <form
-          onSubmit={handleSubmit}
-          className="space-y-4"
+          onSubmit={
+            handleSubmit
+          }
+          className="p-6 space-y-6"
         >
 
           {/* NAME */}
-          <input
-            type="text"
-            name="name"
-            placeholder="Product name"
-            value={form.name}
-            onChange={handleChange}
-            className="w-full border p-4 rounded-2xl"
-            required
-          />
-
-          {/* PRICE */}
-          <input
-            type="number"
-            name="price"
-            placeholder="Price"
-            value={form.price}
-            onChange={handleChange}
-            className="w-full border p-4 rounded-2xl"
-            required
-          />
-
-          {/* STOCK */}
-          <input
-            type="number"
-            name="stock"
-            placeholder="Stock"
-            value={form.stock}
-            onChange={handleChange}
-            className="w-full border p-4 rounded-2xl"
-            required
-          />
-
-          {/* CATEGORY */}
-          <input
-            type="text"
-            name="category"
-            placeholder="Category"
-            value={form.category}
-            onChange={handleChange}
-            className="w-full border p-4 rounded-2xl"
-          />
-
-          {/* IMAGE */}
           <div>
 
-            <label className="block mb-2 font-semibold">
-              Product Image
+            <label className="font-bold block mb-2">
+
+              Product Name
+
             </label>
 
             <input
-                type="file"
-                accept="image/*"
-                multiple
-              onChange={async (e) => {
-
-  const files =
-    Array.from(
-      e.target.files
-    );
-
-  if (!files.length) return;
-
-  try {
-
-    setUploading(true);
-
-    const uploadedImages = [];
-
-    for (const file of files) {
-
-      const imageUrl =
-        await uploadImage(file);
-
-      uploadedImages.push(
-        imageUrl
-      );
-    }
-
-    setForm((prev) => ({
-
-      ...prev,
-
-      image:
-        uploadedImages[0],
-
-      images: [
-        ...(prev.images || []),
-        ...uploadedImages,
-      ],
-    }));
-
-    alert(
-      "✅ Images uploaded"
-    );
-
-  } catch (err) {
-
-    console.error(err);
-
-    alert(
-      "❌ Upload failed"
-    );
-
-  } finally {
-
-    setUploading(false);
-  }
-}}
+              type="text"
+              name="name"
+              placeholder="Nike T-Shirt"
+              value={form.name}
+              onChange={
+                handleChange
+              }
+              className="w-full border p-4 rounded-2xl"
+              required
             />
-            <div className="flex gap-3 mt-4 flex-wrap">
-
-  {form.images?.map(
-    (img, index) => (
-
-      <img
-        key={index}
-        src={img}
-        alt=""
-        className="w-24 h-24 object-cover rounded-2xl border"
-      />
-
-    )
-  )}
-
-</div>
 
           </div>
+
+          {/* PRICE + STOCK */}
+          <div className="grid md:grid-cols-2 gap-4">
+
+            <div>
+
+              <label className="font-bold block mb-2">
+
+                Price
+
+              </label>
+
               <input
-  type="text"
-  placeholder="Sizes (S,M,L,XL)"
-  onChange={(e) =>
-    setForm({
-      ...form,
-      sizes:
-  e.target.value
-    .split(",")
-    .map((s) => s.trim()),
-    })
-  }
-  className="w-full border p-4 rounded-2xl"
-/>
-<input
-  type="text"
-  name="colors"
-  placeholder="Colors ex: Black,White,Blue"
-  value={form.colors}
-  onChange={handleChange}
-  className="w-full border p-4 rounded-2xl"
-/>
+                type="number"
+                name="price"
+                placeholder="120"
+                value={form.price}
+                onChange={
+                  handleChange
+                }
+                className="w-full border p-4 rounded-2xl"
+                required
+              />
+
+            </div>
+
+            <div>
+
+              <label className="font-bold block mb-2">
+
+                Stock
+
+              </label>
+
+              <input
+                type="number"
+                name="stock"
+                placeholder="10"
+                value={form.stock}
+                onChange={
+                  handleChange
+                }
+                className="w-full border p-4 rounded-2xl"
+                required
+              />
+
+            </div>
+
+          </div>
+
+          {/* CATEGORY */}
+          <div>
+
+            <label className="font-bold block mb-2">
+
+              Category
+
+            </label>
+
+            <input
+              type="text"
+              name="category"
+              placeholder="Men"
+              value={form.category}
+              onChange={
+                handleChange
+              }
+              className="w-full border p-4 rounded-2xl"
+            />
+
+          </div>
+
+          {/* SIZES */}
+          <div>
+
+            <label className="font-bold block mb-2">
+
+              Sizes
+
+            </label>
+
+            <input
+              type="text"
+              name="sizes"
+              placeholder="S,M,L,XL"
+              value={form.sizes}
+              onChange={
+                handleChange
+              }
+              className="w-full border p-4 rounded-2xl"
+            />
+
+          </div>
+
+          {/* COLORS */}
+          <div>
+
+            <label className="font-bold block mb-2">
+
+              Colors
+
+            </label>
+
+            <input
+              type="text"
+              name="colors"
+              placeholder="Black,White,Blue"
+              value={form.colors}
+              onChange={
+                handleChange
+              }
+              className="w-full border p-4 rounded-2xl"
+            />
+
+          </div>
+
+          {/* IMAGES */}
+          <div>
+
+            <label className="font-bold block mb-4">
+
+              Product Images
+
+            </label>
+
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={
+                handleUpload
+              }
+              className="w-full border p-4 rounded-2xl"
+            />
+
+            {/* PREVIEW */}
+            {form.images
+              ?.length > 0 && (
+
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-5">
+
+                {form.images.map(
+                  (
+                    img,
+                    index
+                  ) => (
+
+                    <div
+                      key={index}
+                      className="relative"
+                    >
+
+                      <img
+                        src={img}
+                        alt=""
+                        className="w-full h-28 object-cover rounded-2xl border"
+                      />
+
+                      {/* MAIN */}
+                      {index ===
+                        0 && (
+
+                        <div className="absolute top-2 left-2 bg-black text-white text-xs px-2 py-1 rounded-xl">
+
+                          Main
+
+                        </div>
+                      )}
+
+                    </div>
+                  )
+                )}
+
+              </div>
+            )}
+
+          </div>
+
           {/* SUBMIT */}
           <button
             type="submit"
-            disabled={uploading}
-            className="w-full bg-black hover:bg-gray-800 text-white py-4 rounded-2xl font-bold transition"
+            disabled={
+              uploading
+            }
+            className="w-full bg-black hover:bg-gray-800 text-white py-5 rounded-3xl text-lg font-black transition"
           >
 
             {uploading
@@ -290,7 +464,9 @@ export default function ProductModal({
           </button>
 
         </form>
+
       </div>
+
     </div>
   );
 }
