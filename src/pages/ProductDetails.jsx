@@ -10,6 +10,11 @@ import {
 import CartDrawer from "../components/CartDrawer";
 
 import {
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
+
+import {
   useNavigate,
   useParams,
 } from "react-router-dom";
@@ -28,6 +33,7 @@ import {
 export default function ProductDetails() {
 
   const { id } = useParams();
+  
 
  const formRef =
   useRef(null);
@@ -198,6 +204,12 @@ const cartCount =
       ? product.images
       : [product.image];
 
+ const currentImageIndex =
+  gallery.findIndex(
+    (img) =>
+      img === selectedImage
+  );
+
   // ============================
   // COLOR SELECT
   // ============================
@@ -214,6 +226,36 @@ const cartCount =
       );
     };
 
+    const nextImage =
+  () => {
+
+    const nextIndex =
+      currentImageIndex ===
+      gallery.length - 1
+
+        ? 0
+
+        : currentImageIndex + 1;
+
+    setSelectedImage(
+      gallery[nextIndex]
+    );
+  };
+
+const prevImage =
+  () => {
+
+    const prevIndex =
+      currentImageIndex === 0
+
+        ? gallery.length - 1
+
+        : currentImageIndex - 1;
+
+    setSelectedImage(
+      gallery[prevIndex]
+    );
+  };
   // ============================
   // ADD TO CART
   // ============================
@@ -470,9 +512,8 @@ console.log(
         {/* IMAGES */}
         <div className="p-3 md:p-6">
 
-          {/* MAIN */}
-          <div className="overflow-hidden rounded-[30px] bg-gray-100">
-
+{/* MAIN */}
+<div className="relative overflow-hidden rounded-[30px] bg-gray-100">
             <img
               src={
                 selectedImage
@@ -518,6 +559,25 @@ console.log(
 
               className="w-full h-[500px] md:h-[850px] object-cover transition duration-200"
             />
+            {/* LEFT */}
+<button
+  onClick={prevImage}
+  className="absolute top-1/2 left-4 -translate-y-1/2 bg-white/80 backdrop-blur-md w-14 h-14 rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition"
+>
+
+  <ChevronLeft size={30} />
+
+</button>
+
+{/* RIGHT */}
+<button
+  onClick={nextImage}
+  className="absolute top-1/2 right-4 -translate-y-1/2 bg-white/80 backdrop-blur-md w-14 h-14 rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition"
+>
+
+  <ChevronRight size={30} />
+
+</button>
 
           </div>
 

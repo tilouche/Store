@@ -27,7 +27,7 @@ export default function ProductCard({
             "https://via.placeholder.com/300"
           }
           alt=""
-          className="w-full aspect-[3/4] object-cover group-hover:scale-108 transition duration-300"
+          className="w-full aspect-[19/20] object-cover group-hover:scale-108 transition duration-300"
         />
 
       </div>
