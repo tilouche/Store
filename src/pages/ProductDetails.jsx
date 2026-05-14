@@ -227,7 +227,7 @@ const cartCount =
       ) {
 
         return toast.error(
-          "Choose size"
+"اختر المقاس"
         );
       }
 
@@ -275,7 +275,7 @@ const cartCount =
       );
 
       toast.success(
-        "🛒 Added to cart"
+        "🛒 تمت الإضافة إلى سلة التسوق"
       );
     };
 

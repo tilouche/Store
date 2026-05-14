@@ -75,7 +75,7 @@ export default function CheckoutModal({
         });
 
         toast.success(
-          "✅ Order placed!"
+          "✅ تم تقديم الطلب "
         );
 
         setCart([]);
