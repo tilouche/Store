@@ -141,15 +141,14 @@ className="relative bg-black text-white p-3 md:p-4 rounded-2xl"          >
         </div>
       </div>
 
-      {/* HERO */}
-      <div className="max-w-8xl mx-auto ">
-
+     {/* HERO */}
+<div className="max-w-8xl mx-auto">
   <img
-  src={heroImage}
-  alt="hero"
-  className="w-full h-[260
-  px] object-cover rounded-[10px]"
-/>
+    src={heroImage}
+    alt="hero"
+    className="w-full h-[200px] md:h-[270px] object-cover rounded-[10px]"
+  />
+</div>
 
 
         {/* PRODUCTS HEADER */}
