@@ -4,6 +4,12 @@ import {
 } from "react";
 
 import {
+  ShoppingCart,
+} from "lucide-react";
+
+import CartDrawer from "../components/CartDrawer";
+
+import {
   useNavigate,
   useParams,
 } from "react-router-dom";
@@ -28,6 +34,9 @@ export default function ProductDetails() {
 
   const navigate =
     useNavigate();
+
+    const [cartOpen, setCartOpen] =
+  useState(false);
 
   const [product, setProduct] =
     useState(null);
@@ -73,6 +82,19 @@ const subtotal =
 
 const total =
   subtotal + delivery;
+  const cart =
+  JSON.parse(
+    localStorage.getItem(
+      "cart"
+    )
+  ) || [];
+
+const cartCount =
+  cart.reduce(
+    (acc, item) =>
+      acc + item.quantity,
+    0
+  );
   // ============================
   // FETCH
   // ============================
@@ -406,6 +428,44 @@ console.log(
   dir="rtl"
   className="min-h-screen bg-[#f5f5f5]"
 >
+  {/* NAVBAR */}
+<div className="bg-white shadow-sm sticky top-0 z-50">
+
+  <div className="max-w-7xl mx-auto px-4 md:px-6 py-4 md:py-5 flex justify-between items-center">
+
+    {/* LOGO */}
+    <h1
+      onClick={() =>
+        navigate("/")
+      }
+      className="text-2xl md:text-3xl font-black cursor-pointer"
+    >
+
+      🛍 Home
+
+    </h1>
+
+    {/* CART */}
+    <button
+      onClick={() =>
+        setCartOpen(true)
+      }
+      className="relative bg-black text-white p-3 md:p-4 rounded-2xl"
+    >
+
+      <ShoppingCart />
+
+      <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs w-6 h-6 rounded-full flex items-center justify-center">
+
+        {cart.length}
+
+      </span>
+
+    </button>
+
+  </div>
+
+</div>
     <div className="max-w-7xl mx-auto bg-white min-h-screen lg:min-h-0 lg:rounded-[40px] overflow-hidden grid lg:grid-cols-2">
         {/* IMAGES */}
         <div className="p-3 md:p-6">
@@ -462,7 +522,7 @@ console.log(
           </div>
 
           {/* GALLERY */}
-          <div className="flex gap-3 mt-4 overflow-x-auto pb-2">
+          <div className="flex gap-1 mt-3 overflow-x-auto pb-1">
 
             {gallery.map(
               (
@@ -479,7 +539,7 @@ console.log(
                       img
                     )
                   }
-                  className={`w-20 h-20 md:w-24 md:h-24 rounded-2xl object-cover cursor-pointer border-4 transition ${
+                  className={`w-20 h-20 md:w-24 md:h-24 rounded-2xl object-cover cursor-pointer border-5 transition ${
                     selectedImage ===
                     img
                       ? "border-black"
@@ -503,14 +563,14 @@ console.log(
           </p>
 
           {/* TITLE */}
-          <h1 className="text-3xl md:text-5xl font-black mt-4 leading-tight">
+          <h1 className="text-3xl md:text-5xl font-black mt-2 leading-tight">
 
             {product.name}
 
           </h1>
 
           {/* PRICE */}
-          <p className="text-4xl md:text-5xl font-black text-green-600 mt-6">
+          <p className="text-4xl md:text-5xl font-black text-green-600 mt-4">
 
             {product.price} DT
 
@@ -519,11 +579,11 @@ console.log(
           {/* SIZES */}
           {sizes.length > 0 && (
 
-            <div className="mt-10">
+            <div className="mt-4">
 
               <h3 className="font-black text-lg mb-4">
 
-المقاس    
+المقاس    :
               </h3>
 
               <div className="flex gap-3 flex-wrap">
@@ -537,7 +597,7 @@ console.log(
                         size.trim()
                       )
                     }
-                    className={`w-16 h-16 rounded-2xl border text-lg font-black transition ${
+                    className={`w-18 h-18 rounded-2xl border text-lg font-black transition ${
   selectedSize ===
   size.trim()
     ? "bg-black text-white border-black"
@@ -560,11 +620,11 @@ console.log(
           {/* COLORS */}
           {colors.length > 0 && (
 
-            <div className="mt-10">
+            <div className="mt-8">
 
               <h3 className="font-black text-lg mb-4">
 
-              اللون
+              اللون :
               </h3>
 
               <div className="flex gap-4 flex-wrap">
@@ -619,7 +679,7 @@ console.log(
 
   >
   {/* TITLE */}
-  <h2 className="text-3xl font-black mb-8">
+  <h2 className="text-3xl font-black mb-6">
 
     معلومات الطلب
 
@@ -936,7 +996,12 @@ className={`w-full h-16 border-2 rounded-2xl px-5 text-xl outline-none ${
         </div>
 
      
-       
+       <CartDrawer
+  open={cartOpen}
+  setOpen={setCartOpen}
+  cart={cart}
+  setCart={() => {}}
+/>
     </div>
   );
 }

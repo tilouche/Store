@@ -113,11 +113,12 @@ export default function Home() {
     <div className="min-h-screen bg-gray-100">
 
       {/* NAVBAR */}
-      <div className="bg-white shadow-sm sticky top-0 z-50">
+      <div className="bg-[#f5f5f5] shadow-sm sticky top-0 z-50">
 
 <div className="max-w-7xl mx-auto px-4 md:px-6 py-4 md:py-5 flex justify-between items-center">
           {/* LOGO */}
-<h1 className="text-2xl md:text-3xl font-black">            🛍 
+<h1 className="text-2xl md:text-3xl font-black">  
+              🛍 
           </h1>
 
           {/* CART */}
@@ -141,7 +142,7 @@ className="relative bg-black text-white p-3 md:p-4 rounded-2xl"          >
       </div>
 
       {/* HERO */}
-      <div className="max-w-7xl mx-auto px-2 py-6">
+      <div className="max-w-8xl mx-auto ">
 
   <img
   src={heroImage}
@@ -152,10 +153,10 @@ className="relative bg-black text-white p-3 md:p-4 rounded-2xl"          >
 
 
         {/* PRODUCTS HEADER */}
-        <div className="flex justify-between items-center mb-8">
+        <div className="flex justify-between items-center mb-10">
 
-          <h2 className="text-4xl font-black">
-            Products
+          <h2 className="text-3xl mx-auto py-8 font-black">
+            Nouvelle Collection 
           </h2>
 
           <p className="text-gray-400">
@@ -184,7 +185,7 @@ className="relative bg-black text-white p-3 md:p-4 rounded-2xl"          >
     {/* ITEM */}
     <div>
 
-      <div className="text-5xl mb-4">
+      <div className="text-3xl mb-4">
         🏠
       </div>
 
@@ -205,7 +206,7 @@ className="relative bg-black text-white p-3 md:p-4 rounded-2xl"          >
     {/* ITEM */}
     <div>
 
-      <div className="text-5xl mb-4">
+      <div className="text-3xl mb-4">
         🔄
       </div>
 
@@ -226,7 +227,7 @@ className="relative bg-black text-white p-3 md:p-4 rounded-2xl"          >
     {/* ITEM */}
     <div>
 
-      <div className="text-5xl mb-4">
+      <div className="text-3xl mb-4">
         🚚
       </div>
 
@@ -247,7 +248,7 @@ className="relative bg-black text-white p-3 md:p-4 rounded-2xl"          >
     {/* ITEM */}
     <div>
 
-      <div className="text-5xl mb-4">
+      <div className="text-3xl mb-4">
         💵
       </div>
 
@@ -272,18 +273,18 @@ className="relative bg-black text-white p-3 md:p-4 rounded-2xl"          >
 {/* FOOTER */}
 <footer className="bg-[#f5f5f5] py-20 relative">
 
-  <div className="max-w-6xl mx-auto px-6">
+  <div className="max-w-2xl mx-auto px-6">
 
     {/* CONTACT */}
     <div className="text-center">
 
-      <h2 className="text-4xl font-black">
+      <h2 className="text-3xl font-black">
 
         Lundi au Dimanche de 9h à 18h
 
       </h2>
 
-      <p className="text-2xl font-bold mt-4">
+      <p className="text-3xl font-bold mt-4">
 
         +216 *****
 
@@ -294,18 +295,18 @@ className="relative bg-black text-white p-3 md:p-4 rounded-2xl"          >
     </div>
 
     {/* GRID */}
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mt-20 text-center">
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mt-10 text-center">
 
       {/* CATEGORIES */}
       <div>
 
-        <h3 className="text-4xl font-black mb-8">
+        <h3 className="text-3xl font-black mb-5">
 
           Catégories
 
         </h3>
 
-        <div className="space-y-4 text-gray-400 text-2xl">
+        <div className="space-y-2 text-gray-400 text-1xl">
 
           <p>Ensemble </p>
 
@@ -318,13 +319,13 @@ className="relative bg-black text-white p-3 md:p-4 rounded-2xl"          >
       {/* RESOURCES */}
       <div>
 
-        <h3 className="text-4xl font-black mb-8">
+        <h3 className="text-3xl font-black mb-5">
 
           Resources
 
         </h3>
 
-        <div className="space-y-4 text-gray-400 text-2xl">
+        <div className="space-y-2 text-gray-400 text-1xl">
 
           <p>Notre histoire</p>
 
@@ -339,13 +340,13 @@ className="relative bg-black text-white p-3 md:p-4 rounded-2xl"          >
       {/* SOCIAL */}
       <div>
 
-        <h3 className="text-4xl font-black mb-8">
+        <h3 className="text-3xl font-black mb-5">
 
           Social Media
 
         </h3>
 
-        <div className="space-y-4 text-gray-400 text-2xl">
+        <div className="space-y-3 text-gray-400 text-1xl">
 
           <p>Facebook</p>
 
@@ -370,20 +371,8 @@ className="relative bg-black text-white p-3 md:p-4 rounded-2xl"          >
 
   </div>
 
-  {/* SCROLL TOP */}
-  <button
-    onClick={() =>
-      window.scrollTo({
-        top: 0,
-        behavior: "smooth",
-      })
-    }
-    className="fixed bottom-6 right-6 bg-black text-white w-16 h-16 text-3xl rounded-sm shadow-xl"
-  >
 
-    ↑
 
-  </button>
 
 </footer>
 
