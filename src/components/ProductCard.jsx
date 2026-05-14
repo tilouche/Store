@@ -27,7 +27,7 @@ export default function ProductCard({
             "https://via.placeholder.com/300"
           }
           alt=""
-          className="w-full h-72 object-cover group-hover:scale-105 transition duration-300"
+          className="w-full aspect-[3/4] object-cover group-hover:scale-108 transition duration-300"
         />
 
       </div>
@@ -52,7 +52,7 @@ export default function ProductCard({
         {/* PRICE */}
         <p className="text-3xl font-black text-green-600 mt-5">
 
-          {product.price} DT
+          {product.price}  DT
 
         </p>
 

@@ -146,7 +146,7 @@ className="relative bg-black text-white p-3 md:p-4 rounded-2xl"          >
   <img
     src={heroImage}
     alt="hero"
-    className="w-full h-[200px] md:h-[270px] object-cover rounded-[10px]"
+    className="w-full h-[180px] md:h-[250px] object-cover rounded-[10px]"
   />
 
 
@@ -165,7 +165,7 @@ className="relative bg-black text-white p-3 md:p-4 rounded-2xl"          >
         </div>
 
         {/* PRODUCTS GRID */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-55 md:gap-8">
           {products.map((product) => (
 
            <ProductCard
