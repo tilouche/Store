@@ -147,20 +147,20 @@ className="relative bg-black text-white p-3 md:p-4 rounded-2xl"          >
   <img
   src={heroImage}
   alt="hero"
-  className="w-full h-[180
+  className="w-full h-[260
   px] object-cover rounded-[10px]"
 />
 
 
         {/* PRODUCTS HEADER */}
-        <div className="flex justify-between items-center mb-10">
+        <div className="flex justify-between items-center mb-2">
 
-          <h2 className="text-3xl mx-auto py-8 font-black">
-            Nouvelle Collection 
+          <h2 className="text-2xl mx-auto py-8 font-black">
+            Nouvelle Collection: 
           </h2>
 
           <p className="text-gray-400">
-            {products.length} items
+            {products.length} 
           </p>
 
         </div>
