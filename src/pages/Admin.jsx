@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useRef } from "react";
 import toast from "react-hot-toast";
 
+
 import Sidebar from "../components/Sidebar";
 import Navbar from "../components/Navbar";
 import StatsCard from "../components/StatsCard";
@@ -52,6 +53,10 @@ export default function Admin() {
 
   const [activePage, setActivePage] =
     useState("orders");
+
+    const [liveClients,
+setLiveClients] =
+  useState([]);
 
   const [
     openProductModal,
@@ -228,6 +233,7 @@ const fetchOrders =
 
     const channel =
   subscribeToOrders(
+    
     async (payload) => {
 
       console.log(
@@ -271,7 +277,47 @@ const fetchOrders =
       ...prev,
     ]
   );
+  const liveChannel =
+  supabase
+
+    .channel(
+      "live_customers"
+    )
+
+    .on(
+      "postgres_changes",
+      {
+        event: "*",
+        schema: "public",
+        table:
+          "live_customers",
+      },
+
+      (payload) => {
+
+        console.log(
+          "LIVE CLIENT 👉",
+          payload
+        );
+
+        toast.success(
+          "📲 Client en cours"
+        );
+
+        setLiveClients(
+          (prev) => [
+
+            payload.new,
+
+            ...prev,
+          ]
+        );
+      }
+    )
+
+    .subscribe();
 }
+
 
       // REFRESH
       await fetchOrders();
@@ -280,7 +326,9 @@ const fetchOrders =
 
     return () => {
       channel.unsubscribe();
-    };
+
+  liveChannel.unsubscribe();
+};
 
   }, [user]);
 
@@ -379,7 +427,55 @@ const fetchOrders =
           orders={orders}
           products={products}
         />
+{/* LIVE CLIENTS */}
+<div className="bg-white rounded-3xl p-6 shadow-sm mb-6">
 
+  <h2 className="text-3xl font-black mb-6">
+
+    🔥 Clients En Cours
+
+  </h2>
+
+  <div className="space-y-4">
+
+    {liveClients.map(
+      (client, index) => (
+
+        <div
+          key={index}
+          className="border rounded-2xl p-4"
+        >
+
+          <p className="font-black">
+
+            {
+              client.client_name ||
+              "Client"
+            }
+
+          </p>
+
+          <p className="text-gray-500">
+
+            {client.phone}
+
+          </p>
+
+          <p className="text-sm text-gray-400 mt-1">
+
+            {
+              client.product_name
+            }
+
+          </p>
+
+        </div>
+      )
+    )}
+
+  </div>
+
+</div>
         {/* ORDERS */}
         {activePage ===
           "orders" && (

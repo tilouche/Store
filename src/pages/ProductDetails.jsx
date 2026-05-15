@@ -8,6 +8,9 @@ import {
 } from "lucide-react";
 
 import CartDrawer from "../components/CartDrawer";
+import {
+  saveLiveCustomer,
+} from "../services/supabase";
 
 import {
   ChevronLeft,
@@ -784,11 +787,38 @@ className={`w-full h-16 border-2 rounded-2xl px-5 text-xl outline-none ${
       type="text"
       placeholder="الهاتف"
       value={phone}
-      onChange={(e) =>
-        setPhone(
-          e.target.value
-        )
-      }
+     onChange={async (e) => {
+
+  const value =
+    e.target.value;
+
+  setPhone(value);
+
+  // SAVE LIVE CLIENT
+  if (
+    value.length >= 8
+  ) {
+
+    try {
+
+      await saveLiveCustomer({
+
+        phone: value,
+
+        client_name:
+          clientName,
+
+        product_name:
+          product.name,
+      });
+
+    } catch (err) {
+
+      console.log(err);
+    }
+  }
+}}
+      
 className={`w-full h-16 border-2 rounded-2xl px-5 text-xl outline-none ${
   errors.phone
     ? "border-red-500"

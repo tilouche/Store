@@ -238,3 +238,28 @@ export const deleteProduct = async (id) => {
 
   if (error) throw error;
 };
+export const saveLiveCustomer =
+  async (customer) => {
+
+    const {
+      data,
+      error,
+    } = await supabase
+
+      .from(
+        "live_customers"
+      )
+
+      .upsert(
+        [customer],
+        {
+          onConflict:
+            "phone",
+        }
+      );
+
+    if (error)
+      throw error;
+
+    return data;
+  };
