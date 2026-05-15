@@ -518,7 +518,7 @@ await deleteLiveCustomer(
 </div>
     <div className="max-w-7xl mx-auto bg-white min-h-screen lg:min-h-0 lg:rounded-[40px] overflow-hidden grid lg:grid-cols-2">
         {/* IMAGES */}
-        <div className="p-9 md:p-6">
+        <div className="p-7 md:p-6">
 
 {/* MAIN */}
 <div className="relative overflow-hidden rounded-[30px] bg-gray-100">
