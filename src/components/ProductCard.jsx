@@ -54,10 +54,10 @@ const prevImage =
           `/product/${product.id}`
         )
       }
-      className="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl transition cursor-pointer group"
+      className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-2xl transition cursor-pointer group"
     >
 
-      {/* IMAGE */}
+     
       {/* IMAGE */}
 <div className="relative group overflow-hidden">
 
@@ -66,7 +66,7 @@ const prevImage =
       images[currentImage]
     }
     alt=""
-    className="w-full h-72 object-cover group-hover:scale-105 transition duration-300"
+    className="w-full h-90 object-cover group-hover:scale-105 transition duration-300"
   />
 
   {/* LEFT */}
@@ -74,7 +74,7 @@ const prevImage =
 
     <button
       onClick={prevImage}
-      className="absolute opacity-0 group-hover:opacity-100 top-1/2 left-3 -translate-y-1/2 bg-white/80 backdrop-blur-md w-10 h-10 rounded-full flex items-center justify-center shadow-lg transition"
+      className="absolute opacity-80 top-1/2 left-3 -translate-y-1/2 bg-white/80 backdrop-blur-md w-10 h-10 rounded-full flex items-center justify-center shadow-lg transition"
     >
 
       <ChevronLeft size={20} />
@@ -87,7 +87,7 @@ const prevImage =
 
     <button
       onClick={nextImage}
-      className="absolute opacity-0 group-hover:opacity-100 top-1/2 right-3 -translate-y-1/2 bg-white/80 backdrop-blur-md w-10 h-10 rounded-full flex items-center justify-center shadow-lg transition"
+      className="absolute opacity-80 top-1/2 right-3 -translate-y-1/2 bg-white/80 backdrop-blur-md w-10 h-10 rounded-full flex items-center justify-center shadow-lg transition"
     >
 
       <ChevronRight size={20} />
