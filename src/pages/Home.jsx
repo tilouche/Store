@@ -158,14 +158,12 @@ className="relative bg-black text-white p-3 md:p-4 rounded-2xl"          >
             Nouvelle Collection: 
           </h2>
 
-          <p className="text-gray-400">
-            {products.length} 
-          </p>
+        
 
         </div>
 
         {/* PRODUCTS GRID */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-40 md:gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-20 md:gap-8">
           {products.map((product) => (
 
            <ProductCard

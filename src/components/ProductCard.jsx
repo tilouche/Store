@@ -66,7 +66,7 @@ const prevImage =
       images[currentImage]
     }
     alt=""
-    className="w-full h-90 object-cover group-hover:scale-105 transition duration-300"
+    className="w-full h- object-cover group-hover:scale-105 transition duration-300"
   />
 
   {/* LEFT */}
@@ -98,7 +98,7 @@ const prevImage =
 </div>
 
       {/* CONTENT */}
-      <div className="p-5">
+      <div className="p-2">
 
         {/* CATEGORY */}
         <p className="text-gray-400 uppercase text-sm tracking-wider">
@@ -115,7 +115,7 @@ const prevImage =
         </h3>
 
         {/* PRICE */}
-        <p className="text-3xl font-black text-green-600 mt-5">
+        <p className="text-3xl font-black text-green-600 mt-2">
 
           {product.price}  DT
 
