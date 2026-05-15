@@ -1,12 +1,51 @@
 import { useNavigate } from "react-router-dom";
+import {
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 
+import { useState } from "react";
 export default function ProductCard({
   product,
 }) {
 
   const navigate =
     useNavigate();
+    const images =
+  product.images?.length
+    ? product.images
+    : [product.image];
 
+const [currentImage, setCurrentImage] =
+  useState(0);
+const nextImage =
+  (e) => {
+
+    e.stopPropagation();
+
+    setCurrentImage(
+      currentImage ===
+      images.length - 1
+
+        ? 0
+
+        : currentImage + 1
+    );
+  };
+
+const prevImage =
+  (e) => {
+
+    e.stopPropagation();
+
+    setCurrentImage(
+      currentImage === 0
+
+        ? images.length - 1
+
+        : currentImage - 1
+    );
+  };
   return (
 
     <div
@@ -19,18 +58,44 @@ export default function ProductCard({
     >
 
       {/* IMAGE */}
-      <div className="overflow-hidden">
+      {/* IMAGE */}
+<div className="relative group overflow-hidden">
 
-        <img
-          src={
-            product.image ||
-            "https://via.placeholder.com/300"
-          }
-          alt=""
-          className="w-full aspect-[19/20] object-cover group-hover:scale-108 transition duration-300"
-        />
+  <img
+    src={
+      images[currentImage]
+    }
+    alt=""
+    className="w-full h-72 object-cover group-hover:scale-105 transition duration-300"
+  />
 
-      </div>
+  {/* LEFT */}
+  {images.length > 1 && (
+
+    <button
+      onClick={prevImage}
+      className="absolute opacity-0 group-hover:opacity-100 top-1/2 left-3 -translate-y-1/2 bg-white/80 backdrop-blur-md w-10 h-10 rounded-full flex items-center justify-center shadow-lg transition"
+    >
+
+      <ChevronLeft size={20} />
+
+    </button>
+  )}
+
+  {/* RIGHT */}
+  {images.length > 1 && (
+
+    <button
+      onClick={nextImage}
+      className="absolute opacity-0 group-hover:opacity-100 top-1/2 right-3 -translate-y-1/2 bg-white/80 backdrop-blur-md w-10 h-10 rounded-full flex items-center justify-center shadow-lg transition"
+    >
+
+      <ChevronRight size={20} />
+
+    </button>
+  )}
+
+</div>
 
       {/* CONTENT */}
       <div className="p-5">

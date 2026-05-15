@@ -285,7 +285,7 @@ className="relative bg-black text-white p-3 md:p-4 rounded-2xl"          >
 
       <p className="text-3xl font-bold mt-4">
 
-        +216 *****
+        +216 92 700 093
 
       </p>
 
@@ -362,9 +362,12 @@ className="relative bg-black text-white p-3 md:p-4 rounded-2xl"          >
     </div>
 
     {/* COPYRIGHT */}
-    <div className="border-t mt-20 pt-8 text-center text-gray-400 text-lg">
+    <div className="border-t mt-20 pt-8 text-center text-gray-40 text-lg">
+<h3 className="text-3xl font-black mb-5">
+         نحن لسنا الوحيدين  لكننا  الأفضل
 
-     ........
+</h3>
+
 
     </div>
 
