@@ -262,4 +262,24 @@ export const saveLiveCustomer =
       throw error;
 
     return data;
+  };export const deleteLiveCustomer =
+  async (phone) => {
+
+    const {
+      error,
+    } = await supabase
+
+      .from(
+        "live_customers"
+      )
+
+      .delete()
+
+      .eq(
+        "phone",
+        phone
+      );
+
+    if (error)
+      throw error;
   };

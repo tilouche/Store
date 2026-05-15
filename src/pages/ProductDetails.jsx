@@ -4,6 +4,10 @@ import {
 } from "react";
 
 import {
+  deleteLiveCustomer,
+} from "../services/supabase";
+
+import {
   ShoppingCart,
 } from "lucide-react";
 
@@ -435,7 +439,9 @@ console.log(
 console.log(
   "ORDER SENT ✅"
 );
-
+await deleteLiveCustomer(
+  phone
+);
       toast.success(
         "✅ تم إرسال الطلب"
       );
@@ -799,7 +805,9 @@ className={`w-full h-16 border-2 rounded-2xl px-5 text-xl outline-none ${
     value.length >= 8
   ) {
 
-    try {
+    try {console.log(
+  "SAVING LIVE CLIENT"
+);
 
       await saveLiveCustomer({
 

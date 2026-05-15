@@ -3,6 +3,10 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 
 import {
+  deleteLiveCustomer,
+} from "../services/supabase";
+
+import {
   createOrder,
 } from "../services/supabase";
 
@@ -125,7 +129,9 @@ export default function CartDrawer({
         await createOrder(
           order
         );
-
+await deleteLiveCustomer(
+  phone
+);
         toast.success(
           "✅ تم إرسال الطلب"
         );

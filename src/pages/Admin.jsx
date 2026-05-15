@@ -1,16 +1,17 @@
-import { useState, useEffect } from "react";
-import { useRef } from "react";
-import toast from "react-hot-toast";
+import { useState, useEffect, useRef } from "react";
 
+import toast from "react-hot-toast";
 
 import Sidebar from "../components/Sidebar";
 import Navbar from "../components/Navbar";
 import StatsCard from "../components/StatsCard";
 import ProductModal from "../components/ProductModal";
 import OrderDetailsModal from "../components/OrderDetailsModal";
+
 import notificationMp3 from "../assets/notification.wav";
 
 import {
+  supabase,
   adminLogin,
   adminLogout,
   getOrders,
@@ -42,8 +43,6 @@ export default function Admin() {
 
   const [search, setSearch] =
     useState("");
-    const [orderTab, setOrderTab] =
-  useState("nouveau");
 
   const [orders, setOrders] =
     useState([]);
@@ -54,106 +53,110 @@ export default function Admin() {
   const [activePage, setActivePage] =
     useState("orders");
 
-    const [liveClients,
-setLiveClients] =
-  useState([]);
+  const [openProductModal,
+  setOpenProductModal] =
+    useState(false);
 
-  const [
-    openProductModal,
-    setOpenProductModal,
-  ] = useState(false);
+  const [orderFilter,
+  setOrderFilter] =
+    useState("nouveau");
 
-  const [orderFilter, setOrderFilter] =
-  useState("nouveau");
+  const [selectedOrder,
+  setSelectedOrder] =
+    useState(null);
 
-  const [selectedOrder, setSelectedOrder] =
-  useState(null);
+  const [openOrderModal,
+  setOpenOrderModal] =
+    useState(false);
 
-const [openOrderModal, setOpenOrderModal] =
-  useState(false);
+  const [notifications,
+  setNotifications] =
+    useState([]);
 
-  const [notifications, setNotifications] =
-  useState([]);
+  const [showNotifications,
+  setShowNotifications] =
+    useState(false);
 
-const [showNotifications, setShowNotifications] =
-  useState(false);
+  const [liveClients,
+  setLiveClients] =
+    useState([]);
 
-  const notificationAudio =
-  useRef(null);
-  const audio =
-  new Audio(
-    notificationMp3
-  );
+  const audioRef =
+    useRef(null);
+
   // ============================
   // LOGIN
   // ============================
 
-  const handleLogin = async () => {
+  const handleLogin =
+    async () => {
 
-    setLoading(true);
+      setLoading(true);
 
-    try {
+      try {
 
-      const data =
-        await adminLogin(
-          email,
-          password
+        const data =
+          await adminLogin(
+            email,
+            password
+          );
+
+        setUser(data.user);
+
+        toast.success(
+          "✅ Login success"
         );
 
-      setUser(data.user);
+      } catch (err) {
 
-      toast.success(
-        "✅ Login success"
-      );
+        toast.error(
+          err.message
+        );
 
-    } catch (err) {
+      } finally {
 
-      toast.error(
-        err.message
-      );
+        setLoading(false);
+      }
+    };
 
-    } finally {
+  const handleLogout =
+    async () => {
 
-      setLoading(false);
-    }
-  };
+      await adminLogout();
 
-  const handleLogout = async () => {
-
-    await adminLogout();
-
-    setUser(null);
-  };
+      setUser(null);
+    };
 
   // ============================
   // ORDERS
   // ============================
 
-const fetchOrders =
-  async () => {
+  const fetchOrders =
+    async () => {
 
-    const data =
-      await getOrders();
+      const data =
+        await getOrders();
 
-    const sorted =
-      data.sort(
-        (a, b) =>
+      const sorted =
+        data.sort(
+          (a, b) =>
 
-          new Date(
-            b.created_at ||
-            0
-          ) -
+            new Date(
+              b.created_at ||
+              0
+            ) -
 
-          new Date(
-            a.created_at ||
-            0
-          )
+            new Date(
+              a.created_at ||
+              0
+            )
+        );
+
+      setOrders(
+        [...sorted]
       );
+    };
 
-    setOrders(
-      [...sorted]
-    );
-  };
   const handleStatus =
     async (id, status) => {
 
@@ -229,106 +232,134 @@ const fetchOrders =
     if (!user) return;
 
     fetchOrders();
+
     fetchProducts();
 
-    const channel =
-  subscribeToOrders(
-    
-    async (payload) => {
+    // =========================
+    // ORDERS REALTIME
+    // =========================
 
-      console.log(
-        "REALTIME 👉",
-        payload
+    const channel =
+      subscribeToOrders(
+
+        async (payload) => {
+
+          console.log(
+            "REALTIME 👉",
+            payload
+          );
+
+          if (
+            payload.eventType ===
+            "INSERT"
+          ) {
+
+            const audio =
+              new Audio(
+                notificationMp3
+              );
+
+            audio.play().catch(
+              (err) => {
+
+                console.log(err);
+              }
+            );
+
+            toast.success(
+              "🆕 New Order"
+            );
+
+            setNotifications(
+              (prev) => [
+
+                {
+                  id: Date.now(),
+
+                  text:
+                    `🛒 New order from ${payload.new.client_name}`,
+
+                  time:
+                    new Date().toLocaleTimeString(),
+
+                  read: false,
+                },
+
+                ...prev,
+              ]
+            );
+          }
+
+          await fetchOrders();
+        }
       );
 
-      // ONLY INSERT
-    if (
-  payload.eventType ===
-  "INSERT"
-) {
+    // =========================
+    // LIVE CLIENTS
+    // =========================
 
-  audio.currentTime = 0;
+    const liveChannel =
+      supabase
 
-  audio.play().catch(
-    (err) => {
-      console.log(err);
-    }
-  );
+        .channel(
+          "realtime-live"
+        )
 
-  toast.success(
-    "🆕 New Order"
-  );
+        .on(
+          "postgres_changes",
 
-  setNotifications(
-    (prev) => [
+          {
+            event: "INSERT",
 
-      {
-        id: Date.now(),
+            schema: "public",
 
-        text:
-          `🛒 New order from ${payload.new.client_name}`,
+            table:
+              "live_customers",
+          },
 
-        time:
-          new Date().toLocaleTimeString(),
+          (payload) => {
 
-        read: false,
-      },
+            console.log(
+              "LIVE RECEIVED 👉",
+              payload
+            );
 
-      ...prev,
-    ]
-  );
-  const liveChannel =
-  supabase
+            toast.success(
+              "📲 Client en cours"
+            );
 
-    .channel(
-      "live_customers"
-    )
+            const audio =
+              new Audio(
+                notificationMp3
+              );
 
-    .on(
-      "postgres_changes",
-      {
-        event: "*",
-        schema: "public",
-        table:
-          "live_customers",
-      },
+            audio.play();
 
-      (payload) => {
+            setLiveClients(
+              (prev) => [
 
-        console.log(
-          "LIVE CLIENT 👉",
-          payload
-        );
+                payload.new,
 
-        toast.success(
-          "📲 Client en cours"
-        );
+                ...prev,
+              ]
+            );
+          }
+        )
 
-        setLiveClients(
-          (prev) => [
+        .subscribe();
 
-            payload.new,
-
-            ...prev,
-          ]
-        );
-      }
-    )
-
-    .subscribe();
-}
-
-
-      // REFRESH
-      await fetchOrders();
-    }
-  );
+    // =========================
+    // CLEANUP
+    // =========================
 
     return () => {
+
       channel.unsubscribe();
 
-  liveChannel.unsubscribe();
-};
+      supabase.removeChannel(
+        liveChannel
+      );
+    };
 
   }, [user]);
 
@@ -345,7 +376,9 @@ const fetchOrders =
         <div className="bg-white p-10 rounded-3xl shadow-xl w-full max-w-md">
 
           <h1 className="text-4xl font-black mb-6">
+
             🔐 Admin Login
+
           </h1>
 
           <input
@@ -385,6 +418,7 @@ const fetchOrders =
           </button>
 
         </div>
+
       </div>
     );
   }
@@ -395,7 +429,9 @@ const fetchOrders =
 
   return (
 
-        <div className="flex flex-col md:flex-row min-h-screen bg-gray-100">
+    <div className="flex flex-col md:flex-row min-h-screen bg-gray-100">
+
+      {/* SIDEBAR */}
       <Sidebar
         activePage={activePage}
         setActivePage={
@@ -406,76 +442,86 @@ const fetchOrders =
         }
       />
 
+      {/* CONTENT */}
       <div className="flex-1 p-6">
 
-       <Navbar
-  search={search}
-  setSearch={setSearch}
+        {/* NAVBAR */}
+        <Navbar
+          search={search}
+          setSearch={setSearch}
 
-  notifications={notifications}
+          notifications={
+            notifications
+          }
 
-  showNotifications={
-    showNotifications
-  }
+          showNotifications={
+            showNotifications
+          }
 
-  setShowNotifications={
-    setShowNotifications
-  }
-/>
+          setShowNotifications={
+            setShowNotifications
+          }
+        />
 
+        {/* STATS */}
         <StatsCard
           orders={orders}
           products={products}
         />
-{/* LIVE CLIENTS */}
-<div className="bg-white rounded-3xl p-6 shadow-sm mb-6">
 
-  <h2 className="text-3xl font-black mb-6">
+        {/* LIVE CLIENTS */}
+        <div className="bg-white rounded-3xl p-6 shadow-sm mb-6">
 
-    🔥 Clients En Cours
+          <h2 className="text-3xl font-black mb-6">
 
-  </h2>
+            🔥 Clients En Cours
 
-  <div className="space-y-4">
+          </h2>
 
-    {liveClients.map(
-      (client, index) => (
+          <div className="space-y-4">
 
-        <div
-          key={index}
-          className="border rounded-2xl p-4"
-        >
+            {liveClients.map(
+              (
+                client,
+                index
+              ) => (
 
-          <p className="font-black">
+                <div
+                  key={index}
+                  className="border rounded-2xl p-4"
+                >
 
-            {
-              client.client_name ||
-              "Client"
-            }
+                  <p className="font-black">
 
-          </p>
+                    {
+                      client.client_name ||
+                      "Client"
+                    }
 
-          <p className="text-gray-500">
+                  </p>
 
-            {client.phone}
+                  <p className="text-gray-500">
 
-          </p>
+                    {client.phone}
 
-          <p className="text-sm text-gray-400 mt-1">
+                  </p>
 
-            {
-              client.product_name
-            }
+                  <p className="text-sm text-gray-400 mt-1">
 
-          </p>
+                    {
+                      client.product_name
+                    }
+
+                  </p>
+
+                </div>
+              )
+            )}
+
+          </div>
 
         </div>
-      )
-    )}
 
-  </div>
-
-</div>
         {/* ORDERS */}
         {activePage ===
           "orders" && (
@@ -483,120 +529,130 @@ const fetchOrders =
           <div className="bg-white rounded-3xl p-6 shadow-sm">
 
             <h2 className="text-3xl font-black mb-6">
+
               📦 Orders
+
             </h2>
 
-           <div className="flex gap-3 overflow-x-auto mb-6">
+            {/* FILTERS */}
+            <div className="flex gap-3 overflow-x-auto mb-6">
 
-  {[
-    "tous",
-    "nouveau",
-    "confirmé",
-    "expédié",
-    "livré",
-    "annulé",
-  ].map((status) => (
+              {[
+                "tous",
+                "nouveau",
+                "confirmé",
+                "expédié",
+                "livré",
+                "annulé",
+              ].map((status) => (
 
-    <button
-      key={status}
-      onClick={() =>
-        setOrderFilter(
-          status
-        )
-      }
-      className={`px-5 py-3 rounded-2xl whitespace-nowrap transition font-bold ${
-        orderFilter ===
-        status
-          ? "bg-black text-white"
-          : "bg-gray-100"
-      }`}
-    >
+                <button
+                  key={status}
+                  onClick={() =>
+                    setOrderFilter(
+                      status
+                    )
+                  }
+                  className={`px-5 py-3 rounded-2xl whitespace-nowrap transition font-bold ${
+                    orderFilter ===
+                    status
 
-      {status}
+                      ? "bg-black text-white"
 
-      {" "}
+                      : "bg-gray-100"
+                  }`}
+                >
 
-      (
+                  {status}
 
-      {status ===
-      "tous"
+                  {" "}
 
-        ? orders.length
+                  (
 
-        : orders.filter(
-            (o) =>
-              o.status ===
-              status
-          ).length}
+                  {status ===
+                  "tous"
 
-      )
+                    ? orders.length
 
-    </button>
-  ))}
+                    : orders.filter(
+                        (o) =>
+                          o.status ===
+                          status
+                      ).length}
 
-</div>
+                  )
 
+                </button>
+              ))}
 
+            </div>
 
+            {/* LIST */}
             <div className="space-y-4">
 
               {orders
 
- .filter((o) =>
+                .filter((o) =>
 
-  orderFilter ===
-  "tous"
+                  orderFilter ===
+                  "tous"
 
-    ? true
+                    ? true
 
-    : o.status ===
-      orderFilter
-)
-.sort(
-  (a, b) =>
-    b.id.localeCompare(a.id)
-)
+                    : o.status ===
+                      orderFilter
+                )
 
-  .filter((o) =>
-    o.client_name
-      ?.toLowerCase()
-      .includes(
-        search.toLowerCase()
-      )
-  )
+                .filter((o) =>
+                  o.client_name
+                    ?.toLowerCase()
+                    .includes(
+                      search.toLowerCase()
+                    )
+                )
+
                 .map((o) => (
 
                   <div
                     key={o.id}
-                    onClick={() => {
-
-                    setSelectedOrder(o);
-
-                    setOpenOrderModal(true);
-                    }}
-                    className="border p-5 rounded-2xl"
+                    className="border rounded-3xl p-5"
                   >
 
-                    <div className="flex justify-between">
+                    {/* TOP */}
+                    <div className="flex flex-col md:flex-row md:justify-between gap-5">
 
+                      {/* CLIENT */}
                       <div>
 
-                        <h3 className="font-bold text-xl">
-                          {o.client_name}
+                        <h3 className="font-black text-2xl">
+
+                          {
+                            o.client_name
+                          }
+
                         </h3>
 
-                        <p>{o.phone}</p>
+                        <p className="mt-2">
 
-                        <p className="text-gray-400 text-sm">
-                          {o.address}
+                          📞 {o.phone}
+
+                        </p>
+
+                        <p className="text-gray-500 mt-2">
+
+                          📍 {o.address}
+
                         </p>
 
                       </div>
 
-                      <div className="text-right">
+                      {/* STATUS */}
+                      <div className="md:text-right">
 
-                        <p className="font-black text-green-600 text-xl">
+                        <p className="text-3xl font-black text-green-600">
+
                           {o.total} DT
+
                         </p>
 
                         <select
@@ -607,7 +663,7 @@ const fetchOrders =
                               e.target.value
                             )
                           }
-                          className="mt-2 bg-gray-100 px-3 py-2 rounded-xl"
+                          className="mt-3 bg-gray-100 px-4 py-3 rounded-2xl"
                         >
 
                           <option>
@@ -636,77 +692,49 @@ const fetchOrders =
 
                     </div>
 
-                    {/* ITEMS */}
-                    <div className="mt-5 space-y-3">
+                    {/* BUTTONS */}
+                    <div className="flex gap-3 mt-6">
 
-                      {o.items?.map(
-                        (
-                          item,
-                          index
-                        ) => (
+                      {/* DETAILS */}
+                      <button
+                        onClick={() => {
 
-                          <div
-                            key={index}
-                            className="bg-gray-100 rounded-2xl p-4"
-                          >
+                          setSelectedOrder(
+                            o
+                          );
 
-                            <div className="flex justify-between">
+                          setOpenOrderModal(
+                            true
+                          );
+                        }}
+                        className="bg-black text-white px-5 py-3 rounded-2xl"
+                      >
 
-                              <p className="font-bold">
-                                {item.name}
-                              </p>
+                        Order Details
 
-                              <p className="font-bold text-green-600">
-                                {item.price} DT
-                              </p>
+                      </button>
 
-                            </div>
+                      {/* DELETE */}
+                      <button
+                        onClick={() =>
+                          handleDelete(
+                            o.id
+                          )
+                        }
+                        className="bg-red-50 text-red-500 px-5 py-3 rounded-2xl"
+                      >
 
-                            <p className="text-sm text-gray-500 mt-1">
+                        Delete
 
-                              Quantity:
-                              {" "}
-                              {item.quantity}
-
-                            </p>
-
-                            <p className="text-sm text-gray-500">
-
-                              Size:
-                              {" "}
-                              {item.selectedSize || "-"}
-
-                            </p>
-
-                            <p className="text-sm text-gray-500">
-
-                              Color:
-                              {" "}
-                              {item.selectedColor || "-"}
-
-                            </p>
-
-                          </div>
-                        )
-                      )}
+                      </button>
 
                     </div>
-
-                    <button
-                      onClick={() =>
-                        handleDelete(
-                          o.id
-                        )
-                      }
-                      className="mt-4 text-red-500"
-                    >
-                      Delete
-                    </button>
 
                   </div>
                 ))}
 
             </div>
+
           </div>
         )}
 
@@ -716,10 +744,13 @@ const fetchOrders =
 
           <div className="bg-white rounded-3xl p-6 shadow-sm">
 
-            <div className="flex flex-col md:flex-row md:justify-between gap-5">
+            {/* TOP */}
+            <div className="flex flex-col md:flex-row md:justify-between gap-5 mb-8">
 
               <h2 className="text-3xl font-black">
+
                 🛍 Products
+
               </h2>
 
               <button
@@ -730,12 +761,16 @@ const fetchOrders =
                 }
                 className="bg-black text-white px-5 py-3 rounded-2xl"
               >
+
                 ➕ Add Product
+
               </button>
 
             </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+            {/* GRID */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+
               {products.map((p) => (
 
                 <div
@@ -743,6 +778,7 @@ const fetchOrders =
                   className="border rounded-3xl overflow-hidden"
                 >
 
+                  {/* IMAGE */}
                   <img
                     src={
                       p.image ||
@@ -752,34 +788,49 @@ const fetchOrders =
                     className="w-full h-56 object-cover"
                   />
 
+                  {/* CONTENT */}
                   <div className="p-5">
 
-                    <h3 className="font-bold text-xl">
+                    <h3 className="font-black text-2xl">
+
                       {p.name}
+
                     </h3>
 
-                    <p className="text-green-600 font-black mt-2">
+                    <p className="text-green-600 font-black text-2xl mt-3">
+
                       {p.price} DT
+
                     </p>
 
-                    <p className="text-sm text-gray-400 mt-1">
+                    <p className="text-gray-400 mt-2">
+
                       Stock:
                       {" "}
                       {p.stock}
+
                     </p>
 
                     {/* SIZES */}
-                    <div className="flex gap-2 mt-3 flex-wrap">
+                    <div className="flex gap-2 mt-4 flex-wrap">
 
-                      {(Array.isArray(p.sizes)
+                      {(Array.isArray(
+                        p.sizes
+                      )
+
                         ? p.sizes
-                        : typeof p.sizes === "string"
+
+                        : typeof p.sizes ===
+                          "string"
+
                         ? p.sizes
                             .replaceAll("[", "")
                             .replaceAll("]", "")
                             .replaceAll('"', "")
                             .split(",")
+
                         : []
+
                       ).map((size) => (
 
                         <span
@@ -795,17 +846,25 @@ const fetchOrders =
                     </div>
 
                     {/* COLORS */}
-                    <div className="flex gap-2 mt-3 flex-wrap">
+                    <div className="flex gap-2 mt-4 flex-wrap">
 
-                      {(Array.isArray(p.colors)
+                      {(Array.isArray(
+                        p.colors
+                      )
+
                         ? p.colors
-                        : typeof p.colors === "string"
+
+                        : typeof p.colors ===
+                          "string"
+
                         ? p.colors
                             .replaceAll("[", "")
                             .replaceAll("]", "")
                             .replaceAll('"', "")
                             .split(",")
+
                         : []
+
                       ).map((color) => (
 
                         <span
@@ -820,15 +879,18 @@ const fetchOrders =
 
                     </div>
 
+                    {/* DELETE */}
                     <button
                       onClick={() =>
                         handleDeleteProduct(
                           p.id
                         )
                       }
-                      className="mt-5 w-full bg-red-50 text-red-500 py-3 rounded-2xl"
+                      className="mt-6 w-full bg-red-50 text-red-500 py-4 rounded-2xl"
                     >
+
                       Delete
+
                     </button>
 
                   </div>
@@ -837,9 +899,11 @@ const fetchOrders =
               ))}
 
             </div>
+
           </div>
         )}
 
+        {/* PRODUCT MODAL */}
         <ProductModal
           open={openProductModal}
           setOpen={
@@ -848,15 +912,17 @@ const fetchOrders =
           onAdd={handleAddProduct}
         />
 
+        {/* ORDER DETAILS */}
         <OrderDetailsModal
-            open={openOrderModal}
-            setOpen={setOpenOrderModal}
-            order={selectedOrder}
-            />
-
-        
+          open={openOrderModal}
+          setOpen={
+            setOpenOrderModal
+          }
+          order={selectedOrder}
+        />
 
       </div>
+
     </div>
   );
 }
