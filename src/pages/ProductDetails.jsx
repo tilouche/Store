@@ -68,8 +68,7 @@ export default function ProductDetails() {
   const [selectedImage, setSelectedImage] =
     useState("");
 
-  const [zoomStyle, setZoomStyle] =
-    useState({});
+
     const [quantity, setQuantity] =
   useState(1);
   const [clientName, setClientName] =
@@ -519,7 +518,7 @@ await deleteLiveCustomer(
 </div>
     <div className="max-w-7xl mx-auto bg-white min-h-screen lg:min-h-0 lg:rounded-[40px] overflow-hidden grid lg:grid-cols-2">
         {/* IMAGES */}
-        <div className="p-3 md:p-6">
+        <div className="p-9 md:p-6">
 
 {/* MAIN */}
 <div className="relative overflow-hidden rounded-[30px] bg-gray-100">
@@ -556,15 +555,9 @@ await deleteLiveCustomer(
                 });
               }}
 
-              onMouseLeave={() => {
+           
 
-                setZoomStyle({
-                  transform:
-                    "scale(1)",
-                });
-              }}
-
-              style={zoomStyle}
+            
 
               className="w-full h-[500px] md:h-[850px] object-cover transition duration-200"
             />
