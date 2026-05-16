@@ -283,3 +283,48 @@ export const saveLiveCustomer =
     if (error)
       throw error;
   };
+  export const getLiveCustomers =
+  async () => {
+
+    const {
+      data,
+      error,
+    } = await supabase
+
+      .from(
+        "live_customers"
+      )
+
+      .select("*")
+
+      .order(
+        "created_at",
+        {
+          ascending:
+            false,
+        }
+      );
+
+    if (error)
+      throw error;
+
+    return data;
+  };
+  export const deleteLiveClient =
+  async (id) => {
+
+    const {
+      error,
+    } = await supabase
+
+      .from(
+        "live_customers"
+      )
+
+      .delete()
+
+      .eq("id", id);
+
+    if (error)
+      throw error;
+  };

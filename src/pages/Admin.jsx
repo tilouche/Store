@@ -21,6 +21,8 @@ import {
   getProducts,
   addProduct,
   deleteProduct,
+  getLiveCustomers,
+  deleteLiveClient,
 } from "../services/supabase";
 
 export default function Admin() {
@@ -83,6 +85,9 @@ export default function Admin() {
 
   const audioRef =
     useRef(null);
+    const [showLiveClients,
+setShowLiveClients] =
+  useState(true);
 
   // ============================
   // LOGIN
@@ -156,6 +161,36 @@ export default function Admin() {
         [...sorted]
       );
     };
+    const fetchLiveClients =
+  async () => {
+
+    const data =
+      await getLiveCustomers();
+
+    setLiveClients(
+      data || []
+    );
+  };
+  const handleDeleteLiveClient =
+  async (id) => {
+
+    await deleteLiveClient(
+      id
+    );
+
+    setLiveClients(
+      (prev) =>
+
+        prev.filter(
+          (c) =>
+            c.id !== id
+        )
+    );
+
+    toast.success(
+      "🗑 Client deleted"
+    );
+  };
 
   const handleStatus =
     async (id, status) => {
@@ -230,6 +265,7 @@ export default function Admin() {
   useEffect(() => {
 
     if (!user) return;
+    fetchLiveClients();
 
     fetchOrders();
 
@@ -469,58 +505,98 @@ export default function Admin() {
           products={products}
         />
 
-        {/* LIVE CLIENTS */}
-        <div className="bg-white rounded-3xl p-6 shadow-sm mb-6">
+       {/* LIVE CLIENTS */}
+<div className="bg-white rounded-3xl p-6 shadow-sm mb-6">
 
-          <h2 className="text-3xl font-black mb-6">
+  {/* HEADER */}
+  <div className="flex justify-between items-center mb-6">
 
-            🔥 Clients En Cours
+    <h2 className="text-3xl font-black">
 
-          </h2>
+      🔥 Clients En Cours
 
-          <div className="space-y-4">
+    </h2>
 
-            {liveClients.map(
-              (
-                client,
-                index
-              ) => (
+    <button
+      onClick={() =>
+        setShowLiveClients(
+          !showLiveClients
+        )
+      }
+      className="bg-black text-white px-5 py-3 rounded-2xl"
+    >
 
-                <div
-                  key={index}
-                  className="border rounded-2xl p-4"
-                >
+      {showLiveClients
+        ? "Hide"
+        : "Show"}
 
-                  <p className="font-black">
+    </button>
 
-                    {
-                      client.client_name ||
-                      "Client"
-                    }
+  </div>
 
-                  </p>
+  {/* LIST */}
+  {showLiveClients && (
 
-                  <p className="text-gray-500">
+    <div className="space-y-4">
 
-                    {client.phone}
+      {liveClients.map(
+        (client) => (
 
-                  </p>
+          <div
+            key={client.id}
+            className="border rounded-2xl p-4 flex justify-between items-center"
+          >
 
-                  <p className="text-sm text-gray-400 mt-1">
+            {/* INFO */}
+            <div>
 
-                    {
-                      client.product_name
-                    }
+              <p className="font-black">
 
-                  </p>
+                {
+                  client.client_name ||
+                  "Client"
+                }
 
-                </div>
-              )
-            )}
+              </p>
+
+              <p className="text-gray-500">
+
+                {client.phone}
+
+              </p>
+
+              <p className="text-sm text-gray-400 mt-1">
+
+                {
+                  client.product_name
+                }
+
+              </p>
+
+            </div>
+
+            {/* DELETE */}
+            <button
+              onClick={() =>
+                handleDeleteLiveClient(
+                  client.id
+                )
+              }
+              className="bg-red-50 text-red-500 px-4 py-2 rounded-xl"
+            >
+
+              Delete
+
+            </button>
 
           </div>
+        )
+      )}
 
-        </div>
+    </div>
+  )}
+
+</div>
 
         {/* ORDERS */}
         {activePage ===
