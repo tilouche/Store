@@ -3,6 +3,7 @@ import {
   useState,
 } from "react";
 
+
 import {
   deleteLiveCustomer,
 } from "../services/supabase";
@@ -32,6 +33,9 @@ import {
 } from "../services/supabase";
 import {
   getProductById,
+} from "../services/supabase";
+import {
+  getRelatedProducts,
 } from "../services/supabase";
 
 import {
@@ -101,6 +105,10 @@ const total =
     )
   ) || [];
 
+  const [relatedProducts,
+setRelatedProducts] =
+  useState([]);
+
 const cartCount =
   cart.reduce(
     (acc, item) =>
@@ -113,33 +121,51 @@ const cartCount =
 
   useEffect(() => {
 
-    fetchProduct();
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth",
+  });
 
-  }, []);
+  fetchProduct();
 
-  const fetchProduct =
-    async () => {
+}, [id]);
 
-      try {
+const fetchProduct =
+  async () => {
 
-        const data =
-          await getProductById(id);
+    try {
 
-        setProduct(data);
+      const data =
+        await getProductById(id);
 
-        setSelectedImage(
-          data.image
+      setProduct(data);
+
+      setSelectedImage(
+        data.image
+      );
+
+      // RELATED PRODUCTS
+      const related =
+        await getRelatedProducts(
+
+          data.category,
+
+          data.id
         );
 
-      } catch (err) {
+      setRelatedProducts(
+        related
+      );
 
-        console.log(err);
+    } catch (err) {
 
-      } finally {
+      console.log(err);
 
-        setLoading(false);
-      }
-    };
+    } finally {
+
+      setLoading(false);
+    }
+  };
 
   // ============================
   // LOADING
@@ -1093,6 +1119,71 @@ className={`w-full h-16 border-2 rounded-2xl px-5 text-xl outline-none ${
   cart={cart}
   setCart={() => {}}
 />
+{/* RELATED PRODUCTS */}
+<div className="mt-24">
+
+  <h2 className="text-4xl font-black mb-10">
+
+    Produits similaires
+
+  </h2>
+
+  <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+
+    {relatedProducts.map(
+      (item) => (
+
+        <div
+  key={item.id}
+
+  onClick={() =>
+    navigate(
+      `/product/${item.id}`
+    )
+  }
+
+  className="cursor-pointer group"
+>
+
+          {/* IMAGE */}
+          <div className="overflow-hidden rounded-[30px] bg-gray-100">
+
+            <img
+              src={
+                item.image
+              }
+              alt=""
+              className="w-full h-72 object-cover group-hover:scale-105 transition duration-300"
+            />
+
+          </div>
+
+          {/* INFO */}
+          <div className="mt-4">
+
+            <h3 className="font-black text-xl">
+
+              {item.name}
+
+            </h3>
+
+            <p className="text-green-600 font-black mt-2">
+
+              {item.price}
+              {" "}
+              DT
+
+            </p>
+
+          </div>
+
+        </div>
+      )
+    )}
+
+  </div>
+
+</div>
     </div>
   );
 }

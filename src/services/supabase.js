@@ -327,4 +327,32 @@ export const saveLiveCustomer =
 
     if (error)
       throw error;
+  };export const getRelatedProducts =
+  async (category, id) => {
+
+    const {
+      data,
+      error,
+    } = await supabase
+
+      .from("products")
+
+      .select("*")
+
+      .eq(
+        "category",
+        category
+      )
+
+      .neq(
+        "id",
+        id
+      )
+
+      .limit(4);
+
+    if (error)
+      throw error;
+
+    return data;
   };
