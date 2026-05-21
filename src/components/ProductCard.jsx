@@ -66,6 +66,7 @@ const prevImage =
       images[currentImage]
     }
     alt=""
+    loading="lazy"
     className="w-full h- object-cover group-hover:scale-105 transition duration-300"
   />
 

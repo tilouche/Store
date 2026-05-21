@@ -89,6 +89,11 @@ export default function Admin() {
 setShowLiveClients] =
   useState(true);
 
+  const [currentPage,
+setCurrentPage] =
+  useState(1);
+
+const ordersPerPage = 8;
   // ============================
   // LOGIN
   // ============================
@@ -458,7 +463,64 @@ setShowLiveClients] =
       </div>
     );
   }
+const filteredOrders =
 
+  orders
+
+    .filter((o) =>
+
+      orderFilter ===
+      "tous"
+
+        ? true
+
+        : o.status ===
+          orderFilter
+    )
+
+    .filter((o) =>
+      o.client_name
+        ?.toLowerCase()
+        .includes(
+          search.toLowerCase()
+        )
+    )
+
+    .sort(
+      (a, b) =>
+
+        new Date(
+          b.created_at
+        ) -
+
+        new Date(
+          a.created_at
+        )
+    );
+
+const totalPages =
+  Math.ceil(
+
+    filteredOrders.length /
+
+    ordersPerPage
+  );
+
+const startIndex =
+
+  (currentPage - 1) *
+
+  ordersPerPage;
+
+const currentOrders =
+
+  filteredOrders.slice(
+
+    startIndex,
+
+    startIndex +
+    ordersPerPage
+  );
   // ============================
   // DASHBOARD
   // ============================
@@ -620,7 +682,8 @@ setShowLiveClients] =
                 "expédié",
                 "livré",
                 "annulé",
-              ].map((status) => (
+              ]
+              .map((status) => (
 
                 <button
                   key={status}
@@ -664,30 +727,12 @@ setShowLiveClients] =
             </div>
 
             {/* LIST */}
+            
             <div className="space-y-4">
 
-              {orders
-
-                .filter((o) =>
-
-                  orderFilter ===
-                  "tous"
-
-                    ? true
-
-                    : o.status ===
-                      orderFilter
-                )
-
-                .filter((o) =>
-                  o.client_name
-                    ?.toLowerCase()
-                    .includes(
-                      search.toLowerCase()
-                    )
-                )
-
-                .map((o) => (
+            
+{currentOrders.map((o) => (
+              
 
                   <div
                     key={o.id}
@@ -808,6 +853,84 @@ setShowLiveClients] =
 
                   </div>
                 ))}
+                {/* PAGINATION */}
+<div className="flex justify-center gap-3 mt-10 flex-wrap">
+
+  {/* PREV */}
+  <button
+    onClick={() =>
+      setCurrentPage(
+        (prev) =>
+
+          prev > 1
+
+            ? prev - 1
+
+            : prev
+      )
+    }
+    className="px-5 py-3 rounded-2xl bg-gray-100"
+  >
+
+    Prev
+
+  </button>
+
+  {/* PAGES */}
+  {Array.from(
+    {
+      length:
+        totalPages,
+    },
+
+    (_, index) => (
+
+      <button
+        key={index}
+
+        onClick={() =>
+          setCurrentPage(
+            index + 1
+          )
+        }
+
+        className={`w-12 h-12 rounded-2xl font-bold ${
+          currentPage ===
+          index + 1
+
+            ? "bg-black text-white"
+
+            : "bg-gray-100"
+        }`}
+      >
+
+        {index + 1}
+
+      </button>
+    )
+  )}
+
+  {/* NEXT */}
+  <button
+    onClick={() =>
+      setCurrentPage(
+        (prev) =>
+
+          prev < totalPages
+
+            ? prev + 1
+
+            : prev
+      )
+    }
+    className="px-5 py-3 rounded-2xl bg-gray-100"
+  >
+
+    Next
+
+  </button>
+
+</div>
 
             </div>
 
@@ -861,6 +984,7 @@ setShowLiveClients] =
                       "https://via.placeholder.com/300"
                     }
                     alt=""
+                    loading="lazy"
                     className="w-full h-56 object-cover"
                   />
 

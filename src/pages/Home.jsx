@@ -9,7 +9,10 @@ import heroImage from "../assets/heroo.png";
 import { ShoppingCart } from "lucide-react";
 
 import toast from "react-hot-toast";
-
+import {
+  Menu,
+  X,
+} from "lucide-react";
 export default function Home() {
 
   // ============================
@@ -40,6 +43,13 @@ export default function Home() {
     setOpenCheckout,
   ] = useState(false);
 
+  const [selectedCategory,
+setSelectedCategory] =
+  useState("all");
+
+  const [menuOpen,
+setMenuOpen] =
+  useState(false);
   // ============================
   // FETCH PRODUCTS
   // ============================
@@ -110,16 +120,66 @@ export default function Home() {
 
   return (
 
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-[#fafafa]">
 
       {/* NAVBAR */}
-      <div className="bg-[#f5f5f5] shadow-sm sticky top-0 z-50">
+      <div className="bg-[#aaaaaa] shadow-sm sticky top-0 z-50">
 
 <div className="max-w-7xl mx-auto px-4 md:px-6 py-4 md:py-5 flex justify-between items-center">
           {/* LOGO */}
+          {/* MOBILE MENU */}
+<button
+  onClick={() =>
+    setMenuOpen(
+      !menuOpen
+    )
+  }
+  className="md:hidden bg-gray-100 p-3 rounded-2xl"
+>
+
+  {menuOpen
+
+    ? <X />
+
+    : <Menu />}
+    
+</button>
 <h1 className="text-2xl md:text-3xl font-black">  
               🛍 
           </h1>
+{/* CATEGORIES */}
+<div className="hidden md:flex items-center gap-3">
+
+  {[
+    "Ensemble",
+    "T-Shirt",
+  ].map((cat) => (
+
+    <button
+      key={cat}
+
+      onClick={() =>
+        setSelectedCategory(
+          cat
+        )
+      }
+
+      className={`px-5 py-2 rounded-2xl font-bold transition ${
+        selectedCategory ===
+        cat
+
+          ? "bg-black text-white"
+
+          : "bg-gray-100"
+      }`}
+    >
+
+      {cat}
+
+    </button>
+  ))}
+
+</div>
 
           {/* CART */}
           <button
@@ -139,6 +199,47 @@ className="relative bg-black text-white p-3 md:p-4 rounded-2xl"          >
           </button>
 
         </div>
+        {/* MOBILE MENU */}
+{menuOpen && (
+
+  <div className="md:hidden bg-white border-t px-4 py-5 flex flex-col gap-3">
+
+    {[
+      "Ensemble",
+      "T-Shirt",
+    ].map((cat) => (
+
+      <button
+        key={cat}
+
+        onClick={() => {
+
+          setSelectedCategory(
+            cat
+          );
+
+          setMenuOpen(
+            false
+          );
+        }}
+
+        className={`h-14 rounded-2xl font-bold transition ${
+          selectedCategory ===
+          cat
+
+            ? "bg-black text-white"
+
+            : "bg-gray-100"
+        }`}
+      >
+
+        {cat}
+
+      </button>
+    ))}
+
+  </div>
+)}
       </div>
 
      {/* HERO */}
@@ -146,7 +247,8 @@ className="relative bg-black text-white p-3 md:p-4 rounded-2xl"          >
   <img
     src={heroImage}
     alt="hero"
-    className="w-full h-[180px] md:h-[250px] object-cover rounded-[10px]"
+    loading="lazy"
+    className="w-full h-[250px] md:h-[230px] object-cover rounded-[10px]"
   />
 
 
@@ -163,8 +265,21 @@ className="relative bg-black text-white p-3 md:p-4 rounded-2xl"          >
         </div>
 
         {/* PRODUCTS GRID */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-20 md:gap-8">
-          {products.map((product) => (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-20 md:gap-8 p-5">
+          {products
+
+  .filter((product) =>
+
+    selectedCategory ===
+    "all"
+
+      ? true
+
+      : product.category ===
+        selectedCategory
+  )
+
+  .map((product) => (
 
            <ProductCard
             key={product.id}
@@ -175,9 +290,9 @@ className="relative bg-black text-white p-3 md:p-4 rounded-2xl"          >
 
         </div>
 {/* SERVICES */}
-<div className="bg-[#2F2F2F] text-white py-12 mt-24">
+<div className="bg-[#e1e1e1] text-black py-12 mt-24">
 
-  <div className="grid grid-cols-2 md:grid-cols-4 gap-10 max-w-6xl mx-auto px-6 text-center">
+  <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-6xl mx-auto px-6 text-center">
 
     {/* ITEM */}
     <div>
@@ -192,7 +307,7 @@ className="relative bg-black text-white p-3 md:p-4 rounded-2xl"          >
 
       </h3>
 
-      <p className="mt-3 text-white/90">
+      <p className="mt-3 text-gray-700">
 
         Toute la Tunisie
 
@@ -213,7 +328,7 @@ className="relative bg-black text-white p-3 md:p-4 rounded-2xl"          >
 
       </h3>
 
-      <p className="mt-3 text-white/90">
+      <p className="mt-3 text-gray-700">
 
         Echange dans 72H
 
@@ -234,7 +349,7 @@ className="relative bg-black text-white p-3 md:p-4 rounded-2xl"          >
 
       </h3>
 
-      <p className="mt-3 text-white/90">
+      <p className="mt-3 text-gray-700">
 
         Livraison en 1 à 3 jours
 
@@ -255,7 +370,7 @@ className="relative bg-black text-white p-3 md:p-4 rounded-2xl"          >
 
       </h3>
 
-      <p className="mt-3 text-white/90">
+      <p className="mt-3 text-gray-700">
 
         Main à main
 
@@ -268,7 +383,7 @@ className="relative bg-black text-white p-3 md:p-4 rounded-2xl"          >
 </div>
 
 {/* FOOTER */}
-<footer className="bg-[#f5f5f5] py-20 relative">
+<footer className="bg-[#fafafa] py-20 relative">
 
   <div className="max-w-2xl mx-auto px-6">
 

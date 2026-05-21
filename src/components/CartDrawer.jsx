@@ -315,6 +315,7 @@ await deleteLiveCustomer(
                   <img
                     src={item.image}
                     alt=""
+                    loading="lazy"
                     className="w-full h-72 object-cover rounded-[25px]"
                   />
 

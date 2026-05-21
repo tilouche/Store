@@ -41,6 +41,10 @@ import {
 import {
   useRef,
 } from "react";
+import {
+  Menu,
+  X,
+} from "lucide-react";
 export default function ProductDetails() {
 
   const { id } = useParams();
@@ -115,6 +119,10 @@ const cartCount =
       acc + item.quantity,
     0
   );
+
+  const [menuOpen,
+setMenuOpen] =
+  useState(false);
   // ============================
   // FETCH
   // ============================
@@ -152,6 +160,9 @@ const fetchProduct =
 
           data.id
         );
+        
+        console.log(related);
+        
 
       setRelatedProducts(
         related
@@ -507,21 +518,8 @@ await deleteLiveCustomer(
   {/* NAVBAR */}
 <div className="bg-white shadow-sm sticky top-0 z-50">
 
-  <div className="max-w-7xl mx-auto px-4 md:px-6 py-4 md:py-5 flex justify-between items-center">
-
-    {/* LOGO */}
-    <h1
-      onClick={() =>
-        navigate("/")
-      }
-      className="text-2xl md:text-3xl font-black cursor-pointer"
-    >
-
-      🛍 Home
-
-    </h1>
-
-    {/* CART */}
+  <div className="max-w-7xl mx-auto px-4 md:px-6 py-4 md:py-5 flex items-center justify-between gap-3">
+  {/* CART */}
     <button
       onClick={() =>
         setCartOpen(true)
@@ -539,8 +537,110 @@ await deleteLiveCustomer(
 
     </button>
 
+   {/* MOBILE MENU */}
+<button
+  onClick={() =>
+    setMenuOpen(
+      !menuOpen
+    )
+  }
+  className="md:hidden bg-gray-100 p-3 rounded-2xl"
+>
+
+  {menuOpen
+
+    ? <X />
+
+    : <Menu />}
+
+</button>
+
+  
+  </div>
+{/* MOBILE MENU */}
+<div
+  className={`fixed top-0 left-0 w-full h-screen bg-white z-[999] transition-all duration-300 ${
+    menuOpen
+
+      ? "translate-x-0"
+
+      : "-translate-x-full"
+  }`}
+>
+
+  {/* TOP */}
+  <div className="flex justify-between items-center p-6 border-b">
+
+    <h2 className="text-3xl font-black">
+
+      🛍 Menu
+
+    </h2>
+
+    <button
+      onClick={() =>
+        setMenuOpen(false)
+      }
+      className="bg-gray-100 p-3 rounded-2xl"
+    >
+
+      <X />
+
+    </button>
+
   </div>
 
+  {/* LINKS */}
+  <div className="p-6 flex flex-col gap-4">
+
+    <button
+      onClick={() => {
+
+        navigate("/");
+
+        setMenuOpen(false);
+      }}
+
+      className="h-16 rounded-2xl text-xl font-black bg-black text-white"
+    >
+
+      Home
+
+    </button>
+
+    <button
+      onClick={() => {
+
+        navigate("/");
+
+        setMenuOpen(false);
+      }}
+
+      className="h-16 rounded-2xl text-xl font-black bg-gray-100"
+    >
+
+      Ensemble
+
+    </button>
+
+    <button
+      onClick={() => {
+
+        navigate("/");
+
+        setMenuOpen(false);
+      }}
+
+      className="h-16 rounded-2xl text-xl font-black bg-gray-100"
+    >
+
+      T-Shirt
+
+    </button>
+
+  </div>
+
+</div>
 </div>
     <div className="max-w-7xl mx-auto bg-white min-h-screen lg:min-h-0 lg:rounded-[40px] overflow-hidden grid lg:grid-cols-2">
         {/* IMAGES */}
@@ -553,38 +653,7 @@ await deleteLiveCustomer(
                 selectedImage
               }
               alt=""
-              onMouseMove={(e) => {
-
-                const {
-                  left,
-                  top,
-                  width,
-                  height,
-                } =
-                  e.target.getBoundingClientRect();
-
-                const x =
-                  ((e.clientX - left) /
-                    width) *
-                  100;
-
-                const y =
-                  ((e.clientY - top) /
-                    height) *
-                  100;
-
-                setZoomStyle({
-                  transformOrigin:
-                    `${x}% ${y}%`,
-                  transform:
-                    "scale(2)",
-                });
-              }}
-
-           
-
-            
-
+            loading="eager"
               className="w-full h-[500px] md:h-[850px] object-cover transition duration-200"
             />
             {/* LEFT */}
@@ -622,6 +691,7 @@ await deleteLiveCustomer(
                   key={index}
                   src={img}
                   alt=""
+                  loading="lazy"
                   onClick={() =>
                     setSelectedImage(
                       img
@@ -748,6 +818,7 @@ await deleteLiveCustomer(
                           ]
                         }
                         alt=""
+                        loading="lazy"
                         className="w-20 h-20 object-cover"
                       />
 
@@ -809,50 +880,58 @@ className={`w-full h-16 border-2 rounded-2xl px-5 text-xl outline-none ${
     </label>
 
     <input
-      type="text"
-      placeholder="الهاتف"
-      value={phone}
-     onChange={async (e) => {
+  type="tel"
+  placeholder="الهاتف"
+  value={phone}
 
-  const value =
-    e.target.value;
+  onChange={async (e) => {
 
-  setPhone(value);
+    const value =
 
-  // SAVE LIVE CLIENT
-  if (
-    value.length >= 8
-  ) {
+      e.target.value
 
-    try {console.log(
-  "SAVING LIVE CLIENT"
-);
+        .replace(/\D/g, "")
 
-      await saveLiveCustomer({
+        .slice(0, 8);
 
-        phone: value,
+    setPhone(value);
 
-        client_name:
-          clientName,
+    // SAVE LIVE CLIENT
+    if (
+      value.length === 8
+    ) {
 
-        product_name:
-          product.name,
-      });
+      try {
 
-    } catch (err) {
+        console.log(
+          "SAVING LIVE CLIENT"
+        );
 
-      console.log(err);
+        await saveLiveCustomer({
+
+          phone: value,
+
+          client_name:
+            clientName,
+
+          product_name:
+            product.name,
+        });
+
+      } catch (err) {
+
+        console.log(err);
+      }
     }
-  }
-}}
-      
-className={`w-full h-16 border-2 rounded-2xl px-5 text-xl outline-none ${
-  errors.phone
-    ? "border-red-500"
-    : "border-gray-200"
-}`}      />
+  }}
 
-  </div>
+  className={`w-full h-16 border-2 rounded-2xl px-5 text-xl outline-none ${
+    errors.phone
+      ? "border-red-500"
+      : "border-gray-200"
+  }`}
+/>
+</div>
 
   {/* ADDRESS */}
   <div className="mb-6">
@@ -1085,40 +1164,6 @@ className={`w-full h-16 border-2 rounded-2xl px-5 text-xl outline-none ${
 
 </div>
 
-{/* DESKTOP BUTTONS */}
-<div className="hidden md:flex mt-auto pt-10 gap-4">
-
-  <button
-    onClick={handleAddToCart}
-    className="flex-1 bg-black text-white py-5 rounded-3xl font-black"
-  >
-
-    Add To Cart
-
-  </button>
-
-  <button
-    onClick={handleBuyNow}
-    className="flex-1 bg-green-600 text-white py-5 rounded-3xl font-black"
-  >
-
-    Commander Maintenant
-
-  </button>
-
-</div>
-
-          </div>
-
-        </div>
-
-     
-       <CartDrawer
-  open={cartOpen}
-  setOpen={setCartOpen}
-  cart={cart}
-  setCart={() => {}}
-/>
 {/* RELATED PRODUCTS */}
 <div className="mt-24">
 
@@ -1153,6 +1198,7 @@ className={`w-full h-16 border-2 rounded-2xl px-5 text-xl outline-none ${
                 item.image
               }
               alt=""
+              loading="lazy"
               className="w-full h-72 object-cover group-hover:scale-105 transition duration-300"
             />
 
@@ -1184,6 +1230,8 @@ className={`w-full h-16 border-2 rounded-2xl px-5 text-xl outline-none ${
   </div>
 
 </div>
+    </div>
+    </div>
     </div>
   );
 }

@@ -327,7 +327,8 @@ export const saveLiveCustomer =
 
     if (error)
       throw error;
-  };export const getRelatedProducts =
+  };
+  export const getRelatedProducts =
   async (category, id) => {
 
     const {
