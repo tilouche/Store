@@ -308,15 +308,17 @@ await deleteLiveCustomer(
 
                 <div
                   key={`${item.id}-${item.selectedSize}-${item.selectedColor}-${index}`}
-                  className="border rounded-[30px] p-4"
+                  className="border rounded-[30px] p-3"
                 >
+                  
+<div className="flex flex-row items-center gap-4">
 
                   {/* IMAGE */}
                   <img
                     src={item.image}
                     alt=""
                     loading="lazy"
-                    className="w-full h-72 object-cover rounded-[25px]"
+                    className="w-30 h-46 object-contain rounded-[25px]"
                   />
 
                   {/* INFO */}
@@ -421,7 +423,7 @@ await deleteLiveCustomer(
                       </button>
 
                     </div>
-
+</div>
                   </div>
 
                 </div>

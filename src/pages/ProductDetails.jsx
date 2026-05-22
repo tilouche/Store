@@ -516,7 +516,7 @@ await deleteLiveCustomer(
   className="min-h-screen bg-[#f5f5f5]"
 >
   {/* NAVBAR */}
-<div className="bg-white shadow-sm sticky top-0 z-50">
+<div className="bg-[#B2D8D8] shadow-sm sticky top-0 z-50">
 
   <div className="max-w-7xl mx-auto px-4 md:px-6 py-4 md:py-5 flex items-center justify-between gap-3">
   {/* CART */}
@@ -536,7 +536,9 @@ await deleteLiveCustomer(
       </span>
 
     </button>
-
+          <h1>         
+             Logo🛍 
+          </h1>
    {/* MOBILE MENU */}
 <button
   onClick={() =>
@@ -559,7 +561,7 @@ await deleteLiveCustomer(
   </div>
 {/* MOBILE MENU */}
 <div
-  className={`fixed top-0 left-0 w-full h-screen bg-white z-[999] transition-all duration-300 ${
+  className={`fixed top-0 left-0 w-80 h-screen bg-[#B2D8D8] z-[999] transition-all duration-300 ${
     menuOpen
 
       ? "translate-x-0"
@@ -755,7 +757,7 @@ await deleteLiveCustomer(
                         size.trim()
                       )
                     }
-                    className={`w-18 h-18 rounded-2xl border text-lg font-black transition ${
+                    className={`w-12 h-12 rounded-2xl border text-lg font-black transition ${
   selectedSize ===
   size.trim()
     ? "bg-black text-white border-black"
@@ -1232,6 +1234,12 @@ className={`w-full h-16 border-2 rounded-2xl px-5 text-xl outline-none ${
 </div>
     </div>
     </div>
+    <CartDrawer
+  open={cartOpen}
+  setOpen={setCartOpen}
+  cart={cart}
+  setCart={() => {}}
+/>
     </div>
   );
 }

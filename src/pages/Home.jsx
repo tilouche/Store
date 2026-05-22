@@ -5,7 +5,7 @@ import CartDrawer from "../components/CartDrawer";
 import CheckoutModal from "../components/CheckoutModal";
 import useCart from "../hooks/useCart";
 import { getProducts } from "../services/supabase";
-import heroImage from "../assets/heroo.png";
+import heroImage from "../assets/heroo.jpg";
 import { ShoppingCart } from "lucide-react";
 
 import toast from "react-hot-toast";
@@ -123,10 +123,11 @@ setMenuOpen] =
     <div className="min-h-screen bg-[#fafafa]">
 
       {/* NAVBAR */}
-      <div className="bg-[#aaaaaa] shadow-sm sticky top-0 z-50">
+      <div className="bg-[#B2D8D8] shadow-sm sticky top-0 z-50">
 
 <div className="max-w-7xl mx-auto px-4 md:px-6 py-4 md:py-5 flex justify-between items-center">
           {/* LOGO */}
+          
           {/* MOBILE MENU */}
 <button
   onClick={() =>
@@ -144,11 +145,9 @@ setMenuOpen] =
     : <Menu />}
     
 </button>
-<h1 className="text-2xl md:text-3xl font-black">  
-              🛍 
-          </h1>
+
 {/* CATEGORIES */}
-<div className="hidden md:flex items-center gap-3">
+<div className="hidden md:flex  items-center gap-3">
 
   {[
     "Ensemble",
@@ -180,6 +179,15 @@ setMenuOpen] =
   ))}
 
 </div>
+<h1
+  onClick={() =>
+    setSelectedCategory(
+      "all"
+    )
+  }
+  className="text-2xl md:text-3xl font-black cursor-pointer"
+>              🛍 Logo
+          </h1>
 
           {/* CART */}
           <button
@@ -248,7 +256,7 @@ className="relative bg-black text-white p-3 md:p-4 rounded-2xl"          >
     src={heroImage}
     alt="hero"
     loading="lazy"
-    className="w-full h-[250px] md:h-[230px] object-cover rounded-[10px]"
+    className="w-full h-[130px] md:h-[280px] object-cover rounded-[10px]"
   />
 
 
@@ -256,9 +264,26 @@ className="relative bg-black text-white p-3 md:p-4 rounded-2xl"          >
         {/* PRODUCTS HEADER */}
         <div className="flex justify-between items-center mb-2">
 
-          <h2 className="text-2xl mx-auto py-8 font-black">
-            Nouvelle Collection: 
-          </h2>
+         <h2 className="text-2xl mx-auto py-8 font-black">
+
+  {selectedCategory ===
+  "all"
+
+    ? "Accueil"
+
+    : selectedCategory ===
+      "Ensemble"
+
+    ? "Ensembles"
+
+    : selectedCategory ===
+      "T-Shirt"
+
+    ? "T-Shirts"
+
+    : "Produits"}
+
+</h2>
 
         
 
@@ -290,7 +315,7 @@ className="relative bg-black text-white p-3 md:p-4 rounded-2xl"          >
 
         </div>
 {/* SERVICES */}
-<div className="bg-[#e1e1e1] text-black py-12 mt-24">
+<div className="bg-[#efecfa] text-black py-12 mt-24">
 
   <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-6xl mx-auto px-6 text-center">
 
@@ -383,7 +408,7 @@ className="relative bg-black text-white p-3 md:p-4 rounded-2xl"          >
 </div>
 
 {/* FOOTER */}
-<footer className="bg-[#fafafa] py-20 relative">
+<footer className="bg-[#B2d1D8] py-20 relative">
 
   <div className="max-w-2xl mx-auto px-6">
 
@@ -407,12 +432,12 @@ className="relative bg-black text-white p-3 md:p-4 rounded-2xl"          >
     </div>
 
     {/* GRID */}
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mt-10 text-center">
+    <div className="grid grid-cols-3 md:grid-cols-3 gap-5 mt-10 text-center">
 
       {/* CATEGORIES */}
       <div>
 
-        <h3 className="text-3xl font-black mb-5">
+        <h3 className="text-2xl font-black mb-12">
 
           Catégories
 
@@ -431,7 +456,7 @@ className="relative bg-black text-white p-3 md:p-4 rounded-2xl"          >
       {/* RESOURCES */}
       <div>
 
-        <h3 className="text-3xl font-black mb-5">
+        <h3 className="text-2xl font-black mb-12">
 
           Resources
 
@@ -452,7 +477,7 @@ className="relative bg-black text-white p-3 md:p-4 rounded-2xl"          >
       {/* SOCIAL */}
       <div>
 
-        <h3 className="text-3xl font-black mb-5">
+        <h3 className="text-2xl font-black mb-4">
 
           Social Media
 
