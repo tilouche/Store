@@ -437,11 +437,11 @@ className="relative bg-black text-white p-3 md:p-4 rounded-2xl"          >
       {/* CATEGORIES */}
       <div>
 
-        <h3 className="text-2xl font-black mb-12">
+        <h2 className="text-2xl font-black mb-12">
 
           Catégories
 
-        </h3>
+        </h2>
 
         <div className="space-y-2 text-gray-400 text-1xl">
 
@@ -456,11 +456,11 @@ className="relative bg-black text-white p-3 md:p-4 rounded-2xl"          >
       {/* RESOURCES */}
       <div>
 
-        <h3 className="text-2xl font-black mb-12">
+        <h2 className="text-2xl font-black mb-12">
 
           Resources
 
-        </h3>
+        </h2>
 
         <div className="space-y-2 text-gray-400 text-1xl">
 
@@ -477,11 +477,11 @@ className="relative bg-black text-white p-3 md:p-4 rounded-2xl"          >
       {/* SOCIAL */}
       <div>
 
-        <h3 className="text-2xl font-black mb-4">
+        <h2 className="text-2xl font-black mb-4">
 
           Social Media
 
-        </h3>
+        </h2>
 
         <div className="space-y-3 text-gray-400 text-1xl">
 
