@@ -557,7 +557,7 @@ await deleteLiveCustomer(
       !menuOpen
     )
   }
-  className="md:hidden bg-gray-100 p-3 rounded-2xl"
+  className=" bg-gray-100 p-3 rounded-2xl"
 >
 
   {menuOpen
