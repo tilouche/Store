@@ -55,6 +55,18 @@ export default function ProductDetails() {
 
   const navigate =
     useNavigate();
+    
+
+
+     const [cart, setCart] =
+  useState(
+
+    JSON.parse(
+      localStorage.getItem(
+        "cart"
+      )
+    ) || []
+  );
 
     const [cartOpen, setCartOpen] =
   useState(false);
@@ -102,12 +114,7 @@ const subtotal =
 
 const total =
   subtotal + delivery;
-  const cart =
-  JSON.parse(
-    localStorage.getItem(
-      "cart"
-    )
-  ) || [];
+
 
   const [relatedProducts,
 setRelatedProducts] =
@@ -316,53 +323,57 @@ const prevImage =
         );
       }
 
-      const cart =
-        JSON.parse(
-          localStorage.getItem(
-            "cart"
-          )
-        ) || [];
+   const updatedCart =
+      [...cart];
 
-      const existing =
-        cart.find(
-          (item) =>
-            item.id === product.id &&
-            item.selectedSize ===
-              selectedSize &&
-            item.selectedColor ===
-              selectedColor
-        );
-
-      if (existing) {
-
-        existing.quantity += 1;
-
-      } else {
-
-        cart.push({
-
-          ...product,
-
-          quantity,
-
-          selectedSize,
-
-          selectedColor,
-
-          image:
-            selectedImage,
-        });
-      }
-
-      localStorage.setItem(
-        "cart",
-        JSON.stringify(cart)
+    const existing =
+      updatedCart.find(
+        (item) =>
+          item.id ===
+            product.id &&
+          item.selectedSize ===
+            selectedSize &&
+          item.selectedColor ===
+            selectedColor
       );
 
-      toast.success(
-        "🛒 تمت الإضافة إلى سلة التسوق"
-      );
-    };
+    if (existing) {
+
+      existing.quantity +=
+        quantity;
+
+    } else {
+
+      updatedCart.push({
+
+        ...product,
+
+        quantity,
+
+        selectedSize,
+
+        selectedColor,
+
+        image:
+          selectedImage,
+      });
+    }
+
+    localStorage.setItem(
+      "cart",
+      JSON.stringify(
+        updatedCart
+      )
+    );
+
+    setCart(
+      updatedCart
+    );
+
+    toast.success(
+      "🛒 تمت الإضافة إلى سلة التسوق"
+    );
+  };
 
     const validateForm =
   () => {
@@ -613,8 +624,7 @@ await deleteLiveCustomer(
     <button
       onClick={() => {
 
-        navigate("/");
-
+        navigate("/?category=Ensemble");
         setMenuOpen(false);
       }}
 
@@ -628,7 +638,7 @@ await deleteLiveCustomer(
     <button
       onClick={() => {
 
-        navigate("/");
+        navigate("/?category=T-Shirt");
 
         setMenuOpen(false);
       }}
@@ -1238,7 +1248,7 @@ className={`w-full h-16 border-2 rounded-2xl px-5 text-xl outline-none ${
   open={cartOpen}
   setOpen={setCartOpen}
   cart={cart}
-  setCart={() => {}}
+  setCart={setCart}
 />
     </div>
   );

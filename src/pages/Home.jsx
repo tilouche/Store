@@ -13,6 +13,12 @@ import {
   Menu,
   X,
 } from "lucide-react";
+
+import {
+  useNavigate,
+  useSearchParams,
+} from "react-router-dom";
+
 export default function Home() {
 
   // ============================
@@ -43,9 +49,17 @@ export default function Home() {
     setOpenCheckout,
   ] = useState(false);
 
-  const [selectedCategory,
-setSelectedCategory] =
-  useState("all");
+ const [searchParams] =
+  useSearchParams();
+
+const selectedCategory =
+
+  searchParams.get(
+    "category"
+  ) || "all";
+ 
+  const navigate =
+  useNavigate();
 
   const [menuOpen,
 setMenuOpen] =
@@ -83,17 +97,7 @@ setMenuOpen] =
   // ============================
   // ADD TO CART
   // ============================
-<CartDrawer
-  open={cartOpen}
-  setOpen={setCartOpen}
-  cart={cart}
-  setCart={setCart}
-  total={total}
-  increaseQty={increaseQty}
-  decreaseQty={decreaseQty}
-  removeFromCart={removeFromCart}
-  setCheckoutOpen={setOpenCheckout}
-/>
+
  
 
   // ============================
@@ -149,18 +153,25 @@ setMenuOpen] =
 {/* CATEGORIES */}
 <div className="hidden md:flex  items-center gap-3">
 
-  {[
-    "Ensemble",
-    "T-Shirt",
-  ].map((cat) => (
+{[
+  "all",
+  "Ensemble",
+  "T-Shirt",
+].map((cat) => (
 
     <button
-      key={cat}
+      key={cat === "all"
+  ? "Home"
+  : cat}
 
       onClick={() =>
-        setSelectedCategory(
-          cat
-        )
+       navigate(
+  cat === "all"
+
+    ? "/"
+
+    : `/?category=${cat}`
+)
       }
 
       className={`px-5 py-2 rounded-2xl font-bold transition ${
@@ -180,11 +191,9 @@ setMenuOpen] =
 
 </div>
 <h1
-  onClick={() =>
-    setSelectedCategory(
-      "all"
-    )
-  }
+ onClick={() =>
+  navigate("/")
+}
   className="text-2xl md:text-3xl font-black cursor-pointer"
 >              🛍 Logo
           </h1>
@@ -207,12 +216,14 @@ className="relative bg-black text-white p-3 md:p-4 rounded-2xl"          >
           </button>
 
         </div>
-        {/* MOBILE MENU */}
+       
+{/* MOBILE MENU */}
 {menuOpen && (
 
   <div className="md:hidden bg-white border-t px-4 py-5 flex flex-col gap-3">
 
     {[
+      "all",
       "Ensemble",
       "T-Shirt",
     ].map((cat) => (
@@ -222,34 +233,39 @@ className="relative bg-black text-white p-3 md:p-4 rounded-2xl"          >
 
         onClick={() => {
 
-          setSelectedCategory(
-            cat
+          navigate(
+
+            cat === "all"
+
+              ? "/"
+
+              : `/?category=${cat}`
           );
 
-          setMenuOpen(
-            false
-          );
+          setMenuOpen(false);
         }}
 
         className={`h-14 rounded-2xl font-bold transition ${
           selectedCategory ===
           cat
 
-            ? "bg-black text-white"
+            ? "bg-[#B2D8D8] text-black"
 
             : "bg-gray-100"
         }`}
       >
 
-        {cat}
+        {cat === "all"
+          ? "Home"
+          : cat}
 
       </button>
     ))}
 
   </div>
-)}
-      </div>
-
+ )}
+  
+  </div>
      {/* HERO */}
 <div className="max-w-8xl mx-auto">
   <img
@@ -520,14 +536,16 @@ className="relative bg-black text-white p-3 md:p-4 rounded-2xl"          >
 
       {/* CART DRAWER */}
       <CartDrawer
-        open={cartOpen}
-        setOpen={setCartOpen}
-        cart={cart}
-        setCart={setCart}
-        setCheckoutOpen={
-          setOpenCheckout
-        }
-      />
+  open={cartOpen}
+  setOpen={setCartOpen}
+  cart={cart}
+  setCart={setCart}
+  total={total}
+  increaseQty={increaseQty}
+  decreaseQty={decreaseQty}
+  removeFromCart={removeFromCart}
+  setCheckoutOpen={setOpenCheckout}
+/>
 
       {/* CHECKOUT */}
       <CheckoutModal
@@ -539,4 +557,4 @@ className="relative bg-black text-white p-3 md:p-4 rounded-2xl"          >
 
     </div>
   );
-}
+  }

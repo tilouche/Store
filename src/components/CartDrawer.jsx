@@ -183,7 +183,9 @@ await deleteLiveCustomer(
     localStorage.setItem(
       "cart",
       JSON.stringify(updated)
+      
     );
+    setCart(updated);
   };
 
   // ============================
@@ -216,6 +218,7 @@ await deleteLiveCustomer(
       "cart",
       JSON.stringify(updated)
     );
+    setCart(updated);
   };
 
   // ============================
@@ -236,6 +239,7 @@ await deleteLiveCustomer(
       "cart",
       JSON.stringify(updated)
     );
+     setCart(updated);
   };
 
   // ============================
@@ -415,7 +419,7 @@ await deleteLiveCustomer(
                             item.id
                           )
                         }
-                        className="text-red-500 font-bold"
+                        className="text-red-500 font-bold "
                       >
 
                         حذف
