@@ -144,7 +144,47 @@ export default function OrderDetailsModal({
                         {" "}
                         {item.selectedColor || "-"}
                       </p>
+{/* OFFER DETAILS */}
+{item.selectedOffer && (
 
+  <div className="mt-4 bg-gray-100 rounded-2xl p-4 text-black">
+
+    <div className="font-black text-lg mb-3">
+
+      {item.selectedOffer.title}
+
+    </div>
+
+    {Object.entries(
+      item.offerSelections || {}
+    ).map(
+      ([key, value]) => (
+
+        <div
+          key={key}
+          className="mb-2"
+        >
+
+          <span className="font-bold">
+
+            Item {Number(key) + 1}
+
+          </span>
+
+          {" : "}
+
+          {value.color}
+
+          {" / "}
+
+          {value.size}
+
+        </div>
+      )
+    )}
+
+  </div>
+)}
                     </div>
 
                   </div>

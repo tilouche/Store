@@ -138,9 +138,7 @@ await deleteLiveCustomer(
 
         setCart([]);
 
-        localStorage.removeItem(
-          "cart"
-        );
+        
 
         setClientName("");
 
@@ -333,7 +331,43 @@ await deleteLiveCustomer(
                       {item.name}
 
                     </h3>
+                  {/* OFFER */}
+{item.selectedOffer && (
 
+  <div className="mt-3 bg-gray-100 p-3 rounded-2xl">
+
+    <div className="font-black text-black mb-2">
+
+      {item.selectedOffer.title}
+
+    </div>
+
+    {Object.entries(
+      item.offerSelections || {}
+    ).map(
+      ([key, value]) => (
+
+        <div
+          key={key}
+          className="text-sm text-gray-600"
+        >
+
+           {Number(key) + 1}
+
+          {" : "}
+
+          {value.color}
+
+          {" / "}
+
+          {value.size}
+
+        </div>
+      )
+    )}
+
+  </div>
+)}
                     {/* SIZE */}
                     {item.selectedSize && (
 
@@ -341,12 +375,171 @@ await deleteLiveCustomer(
 
                         المقاس:
                         {" "}
-                        {
-                          item.selectedSize
-                        }
+                       {item.selectedOffer ? (
+
+  <div className="mt-2 text-sm">
+
+    <div className="font-black">
+
+      {item.selectedOffer.title}
+
+    </div>
+
+    {Object.entries(
+      item.offerSelections || {}
+    ).map(
+      ([key, value]) => (
+
+        <div key={key}>
+
+          Item {" "}
+          {Number(key) + 1}
+
+          {" : "}
+
+          {value.color}
+
+          {" / "}
+
+          {value.size}
+
+        </div>
+      )
+    )}
+
+  </div>
+
+) : (
+
+  <div className="text-sm text-gray-500">
+
+ {/* NORMAL PRODUCT */}
+{!item.selectedOffer ? (
+
+  <div className="text-sm text-gray-500 mt-2">
+
+    {item.selectedSize}
+    {" / "}
+    {item.selectedColor}
+
+  </div>
+
+) : (
+
+  <div className="mt-3 bg-gray-100 rounded-2xl p-3">
+
+    <div className="font-black mb-2 text-black">
+
+      {item.selectedOffer.title}
+
+    </div>
+
+    {Object.entries(
+      item.offerSelections || {}
+    ).map(
+      ([key, value]) => (
+
+        <div
+          key={key}
+          className="text-sm text-gray-600 mb-1"
+        >
+
+          Piece {" "}
+          {Number(key) + 1}
+
+          {" : "}
+
+          {value.color}
+
+          {" / "}
+
+          {value.size}
+
+        </div>
+      )
+    )}
+
+  </div>
+)}
+{/* OFFER PRODUCT */}
+{item.selectedOffer && (
+
+  <div className="mt-3 bg-gray-100 rounded-2xl p-3">
+
+    <div className="font-black mb-2">
+
+      {item.selectedOffer.title}
+
+    </div>
+
+    {Object.entries(
+      item.offerSelections || {}
+    ).map(
+      ([key, value]) => (
+
+        <div
+          key={key}
+          className="text-sm text-gray-600 mb-1"
+        >
+
+          Piece {" "}
+          {Number(key) + 1}
+
+          {" : "}
+
+          {value.color}
+
+          {" / "}
+
+          {value.size}
+
+        </div>
+      )
+    )}
+
+  </div>
+)}
+
+  </div>
+)}
 
                       </p>
                     )}
+                    {/* CUSTOM OPTIONS */}
+{item.selectedOptions && (
+
+  <div className="mt-3 space-y-2">
+
+    {Object.entries(
+      item.selectedOptions
+    ).map(
+      ([key, value]) => (
+
+        <div
+          key={key}
+          className="text-sm bg-gray-100 rounded-xl p-2"
+        >
+
+          <span className="font-black">
+
+            {key}
+
+          </span>
+
+          {" : "}
+
+          {value.size}
+
+          {" / "}
+
+          {value.color}
+
+        </div>
+      )
+    )}
+
+  </div>
+)}
 
                     {/* COLOR */}
                     {item.selectedColor && (

@@ -108,14 +108,6 @@ const [city, setCity] =
 
 const delivery = 8;
 
-const subtotal =
-  (product?.price || 0) *
-  quantity;
-
-const total =
-  subtotal + delivery;
-
-
   const [relatedProducts,
 setRelatedProducts] =
   useState([]);
@@ -130,6 +122,35 @@ const cartCount =
   const [menuOpen,
 setMenuOpen] =
   useState(false);
+
+const [selectedOffer,
+setSelectedOffer] =
+  useState(null);
+
+const [offerSelections,
+setOfferSelections] =
+  useState({});
+  
+  const addonsPrice =
+
+  product?.addons?.find(
+    (p) =>
+      p.title ===
+      selectedOffer?.title
+  )?.price || 0;
+
+const subtotal =
+
+  (selectedOffer
+    ? addonsPrice
+    : product?.price || 0)
+
+  * quantity;
+
+const total =
+  subtotal + delivery;
+
+
   // ============================
   // FETCH
   // ============================
@@ -154,7 +175,11 @@ const fetchProduct =
         await getProductById(id);
 
       setProduct(data);
+      console.log(
+  typeof data.options,
 
+  data.options
+);
       setSelectedImage(
         data.image
       );
@@ -259,27 +284,31 @@ const fetchProduct =
     (img) =>
       img === selectedImage
   );
+// ============================
+// COLOR SELECT
+// ============================
 
-  // ============================
-  // COLOR SELECT
-  // ============================
+const handleColorSelect =
+  (color, image) => {
 
-  const handleColorSelect =
-    (color, image) => {
+    setSelectedColor(
+      color
+    );
 
-      setSelectedColor(
-        color
-      );
+    setSelectedImage(
+      image
+    );
+  };
 
-      setSelectedImage(
-        image
-      );
-    };
+// ============================
+// IMAGE SLIDER
+// ============================
 
-    const nextImage =
+const nextImage =
   () => {
 
     const nextIndex =
+
       currentImageIndex ===
       gallery.length - 1
 
@@ -296,6 +325,7 @@ const prevImage =
   () => {
 
     const prevIndex =
+
       currentImageIndex === 0
 
         ? gallery.length - 1
@@ -307,36 +337,49 @@ const prevImage =
     );
   };
   // ============================
-  // ADD TO CART
+  // COLOR SELECT
   // ============================
 
   const handleAddToCart =
-    () => {
+  () => {
 
-      if (
-        sizes.length > 0 &&
-        !selectedSize
-      ) {
+    if (
 
-        return toast.error(
-"اختر المقاس"
-        );
-      }
+  !selectedOffer &&
 
-   const updatedCart =
+  sizes.length > 0 &&
+
+  !selectedSize
+){
+
+      return toast.error(
+        "اختر المقاس"
+      );
+    }
+
+    const updatedCart =
       [...cart];
 
-    const existing =
-      updatedCart.find(
-        (item) =>
-          item.id ===
-            product.id &&
-          item.selectedSize ===
-            selectedSize &&
-          item.selectedColor ===
-            selectedColor
-      );
+const existing =
+  updatedCart.find(
+    (item) =>
 
+      item.id ===
+      product.id &&
+
+      JSON.stringify(
+        item.offerSelections
+      ) ===
+
+      JSON.stringify(
+        offerSelections
+      ) &&
+
+      item.selectedOffer
+        ?.title ===
+      selectedOffer
+        ?.title
+  );
     if (existing) {
 
       existing.quantity +=
@@ -354,8 +397,17 @@ const prevImage =
 
         selectedColor,
 
+        selectedOffer,
+
+        offerSelections,
+
         image:
           selectedImage,
+
+          price:
+  selectedOffer
+    ? addonsPrice
+    : product.price,
       });
     }
 
@@ -371,9 +423,10 @@ const prevImage =
     );
 
     toast.success(
-      "🛒 تمت الإضافة إلى سلة التسوق"
+      "🛒 تمت الإضافة إلى السلة"
     );
   };
+ 
 
     const validateForm =
   () => {
@@ -393,17 +446,57 @@ const prevImage =
       newErrors.city = true;
 
     if (
-      sizes.length > 0 &&
-      !selectedSize
-    ) {
 
-      newErrors.size = true;
-    }
+  !selectedOffer &&
+
+  sizes.length > 0 &&
+
+  !selectedSize
+) {
+
+  newErrors.size = true;
+}
 
     setErrors(
       newErrors
     );
 
+if (
+  selectedOffer
+) {
+
+  const missing =
+
+    Array.from({
+      length:
+        selectedOffer.pieces,
+    }).some(
+      (_, index) => {
+
+        const current =
+
+          offerSelections[
+            index
+          ];
+
+        return (
+
+          !current?.size ||
+
+          !current?.color
+        );
+      }
+    );
+
+  if (missing) {
+
+    toast.error(
+      "اختر tailles و couleurs"
+    );
+
+    return false;
+  }
+}
     // SCROLL
     if (
       Object.keys(
@@ -467,12 +560,16 @@ const prevImage =
 
             quantity,
 
-            price:
-              product.price,
+           price:
+  selectedOffer
+    ? addonsPrice
+    : product.price,
 
             selectedSize,
 
             selectedColor,
+            offerSelections,
+            selectedOffer,
           },
         ],
       };
@@ -747,103 +844,362 @@ await deleteLiveCustomer(
           </p>
 
           {/* SIZES */}
-          {sizes.length > 0 && (
+{(!product?.addons ||
+  product.addons.length === 0) &&
 
-            <div className="mt-4">
+  sizes.length > 0 && (
 
-              <h3 className="font-black text-lg mb-4">
+  <div className="mt-4">
 
-المقاس    :
-              </h3>
+    <h3 className="font-black text-lg mb-4">
 
-              <div className="flex gap-3 flex-wrap">
+      المقاس :
 
-                {sizes.map((size) => (
+    </h3>
 
-                  <button
-                    key={size}
-                    onClick={() =>
-                      setSelectedSize(
-                        size.trim()
-                      )
-                    }
-                    className={`w-12 h-12 rounded-2xl border text-lg font-black transition ${
-  selectedSize ===
-  size.trim()
-    ? "bg-black text-white border-black"
-    : errors.size
-    ? "border-red-500"
-    : "border-gray-200"
-}`}
-                  >
+    <div className="flex gap-3 flex-wrap">
 
-                    {size.trim()}
+      {sizes.map((size) => (
 
-                  </button>
-                ))}
+        <button
+          key={size}
+
+          onClick={() =>
+            setSelectedSize(
+              size.trim()
+            )
+          }
+
+          className={`w-12 h-12 rounded-2xl border text-lg font-black transition ${
+            selectedSize ===
+            size.trim()
+
+              ? "bg-black text-white border-black"
+
+              : errors.size
+
+              ? "border-red-500"
+
+              : "border-gray-200"
+          }`}
+        >
+
+          {size.trim()}
+
+        </button>
+      ))}
+
+    </div>
+
+  </div>
+)}
+
+{/* COLORS */}
+{(!product?.addons ||
+  product.addons.length === 0) &&
+
+  colors.length > 0 && (
+
+  <div className="mt-8">
+
+    <h3 className="font-black text-lg mb-4">
+
+      اللون :
+
+    </h3>
+
+    <div className="flex gap-4 flex-wrap">
+
+      {colors.map(
+        (
+          color,
+          index
+        ) => (
+
+          <div
+            key={color}
+
+            onClick={() =>
+              handleColorSelect(
+                color.trim(),
+                gallery[index]
+              )
+            }
+
+            className={`cursor-pointer rounded-2xl overflow-hidden border-4 transition ${
+              selectedColor ===
+              color.trim()
+
+                ? "border-black"
+
+                : "border-transparent"
+            }`}
+          >
+
+            <img
+              src={
+                gallery[index]
+              }
+              alt=""
+              loading="lazy"
+              className="w-20 h-20 object-cover"
+            />
+
+          </div>
+        )
+      )}
+
+    </div>
+
+  </div>
+)}
+
+{/* OFFERS */}
+{product?.addons?.length > 0 && (
+
+  <div className="mt-10">
+
+    <h2 className="text-2xl font-black mb-6">
+
+      Offres
+
+    </h2>
+
+    <div className="space-y-5">
+
+      {product.addons.map(
+        (offer, index) => (
+
+          <div key={index}>
+
+            {/* OFFER CARD */}
+            <button
+              type="button"
+
+              onClick={() =>
+                setSelectedOffer(
+                  offer
+                )
+              }
+
+              className={`w-full border-2 rounded-[30px] p-5 transition ${
+                selectedOffer?.title ===
+                offer.title
+
+                  ? "border-blue-600 bg-purple-100"
+
+                  : "border-gray-200 bg-white"
+              }`}
+            >
+
+              <div className="flex justify-between items-center">
+
+                <div className="text-right">
+
+                  <h3 className="text-2xl font-black">
+
+                    {offer.title}
+
+                  </h3>
+
+                  <p className="text-lg">
+
+                    5DT-
+
+                  </p>
+
+                </div>
+
+                <div className="text-blue-700 text-3xl font-black">
+
+                  {offer.price} DT
+
+                </div>
 
               </div>
 
-            </div>
-          )}
+            </button>
+            
 
-          {/* COLORS */}
-          {colors.length > 0 && (
+            {/* OPEN CONTENT */}
+{selectedOffer?.title ===
+  offer.title && (
 
-            <div className="mt-8">
+  <div className="bg-[#1ab3a8] text-white rounded-[30px] p-6 mt-4">
 
-              <h3 className="font-black text-lg mb-4">
+    {/* TOP */}
+    <div className="flex justify-between items-center mb-8">
 
-              اللون :
-              </h3>
+      <div>
 
-              <div className="flex gap-4 flex-wrap">
+        <h3 className="text-3xl font-black">
+
+          {offer.title}
+
+        </h3>
+
+        <p className="text-xl">
+
+          5DT-
+
+        </p>
+
+      </div>
+
+      <div className="text-4xl font-black">
+
+        DT {offer.price}
+
+      </div>
+
+    </div>
+
+    {/* ITEMS */}
+    <div className=" space-y-5">
+
+      {Array.from({
+        length:
+          offer.pieces,
+      }).map(
+        (_, itemIndex) => {
+
+          const current =
+
+            offerSelections[
+              itemIndex
+            ] || {};
+
+          return (
+
+            <div
+              key={itemIndex}
+              className=" grid grid-cols-1 md:grid-cols-3 gap-4 items-center"
+            >
+
+              {/* ITEM TITLE */}
+              <div className=" text-2xl font-black">
+
+                {itemIndex + 1}
+
+              </div>
+
+              {/* COLOR */}
+              <select 
+                value={
+                  current.color ||
+                  ""
+                }
+
+                onChange={(e) =>
+
+                  setOfferSelections(
+                    (prev) => ({
+
+                      ...prev,
+
+                      [itemIndex]: {
+
+                        ...prev[
+                          itemIndex
+                        ],
+
+                        color:
+                          e.target.value,
+                      },
+                    })
+                  )
+                }
+
+                className="h-14 rounded-2xl bg-[#B2D8D8] text-black px-4"
+              >
+
+                <option value="">
+                  color
+                </option>
 
                 {colors.map(
-                  (
-                    color,
-                    index
-                  ) => (
+                  (color) => (
 
-                    <div
+                    <option
                       key={color}
-                      onClick={() =>
-                        handleColorSelect(
-                          color.trim(),
-                          gallery[
-                            index
-                          ]
-                        )
-                      }
-                      className={`cursor-pointer rounded-2xl overflow-hidden border-4 transition ${
-                        selectedColor ===
-                        color.trim()
-                          ? "border-black"
-                          : "border-transparent"
-                      }`}
                     >
 
-                      <img
-                        src={
-                          gallery[
-                            index
-                          ]
-                        }
-                        alt=""
-                        loading="lazy"
-                        className="w-20 h-20 object-cover"
-                      />
+                      {color}
 
-                    </div>
+                    </option>
                   )
                 )}
 
-              </div>
+              </select>
+
+              {/* SIZE */}
+              <select
+                value={
+                  current.size ||
+                  ""
+                }
+
+                onChange={(e) =>
+
+                  setOfferSelections(
+                    (prev) => ({
+
+                      ...prev,
+
+                      [itemIndex]: {
+
+                        ...prev[
+                          itemIndex
+                        ],
+
+                        size:
+                          e.target.value,
+                      },
+                    })
+                  )
+                }
+
+                className="h-14 rounded-2xl bg-[#B2D8D8] text-black px-4"
+              >
+
+                <option value="">
+                  taille
+                </option>
+
+                {sizes.map(
+                  (size) => (
+
+                    <option
+                      key={size}
+                    >
+
+                      {size}
+
+                    </option>
+                  )
+                )}
+
+              </select>
 
             </div>
-          )}
+          );
+        }
+      )}
 
-       
+    </div>
+
+  </div>
+)}
+      
+
+          </div>
+        )
+      )}
+
+    </div>
+
+  </div>
+)}
           {/* CHECKOUT FORM */}
 <div
   ref={formRef}
@@ -1050,6 +1406,43 @@ className={`w-full h-16 border-2 rounded-2xl px-5 text-xl outline-none ${
         ,
         {" "}
         {selectedColor || "-"}
+       {selectedOffer && (
+
+  <div className="mt-4">
+
+    <div className="font-black text-lg mb-3">
+
+      {selectedOffer.title}
+
+    </div>
+
+    {Object.entries(
+      offerSelections
+    ).map(
+      ([key, value]) => (
+
+        <div
+          key={key}
+          className="text-sm mt-2"
+        >
+
+          Item {" "}
+          {Number(key) + 1}
+
+          {" : "}
+
+          {value.color || "-"}
+
+          {" / "}
+
+          {value.size || "-"}
+
+        </div>
+      )
+    )}
+
+  </div>
+)}
         )
 
       </span>
